@@ -71,9 +71,68 @@ class Candidate(models.Model):
 	def __unicode__(self):
 		return self.last_name
 
-	##
-	## TODO: Fill with remaining fields from candidate form
-	##
+	# Education levels
+	EDU_LEVELS = (
+		('N', 'None'),
+		('H', 'High School Diploma'),
+		('T', 'Technical Diploma'),
+		('A', 'Associate\'s Degree'),
+		('B', 'Bachelor\'s Degree'),
+		('M', 'Master\'s Degree'),
+		('D', 'Doctorate Degree')
+	)
+
+	# Candidate's highest education level
+	highest_education = models.CharField(
+		max_length = 1,
+		choices = EDU_LEVELS
+	)
+	def __unicode__(self):
+		return self.highest_education
+
+	# Education status levels
+	EDU_STATUS = (
+		('G', 'Graduated'),
+		('I', 'In Progress'),
+		('N', 'Not Complete')
+	)
+
+	# Candidate's education status
+	education_status = models.CharField(
+		max_length = 1,
+		choices = EDU_STATUS
+	)
+	def __unicode__(self):
+		return self.education_status
+
+	# Program (major/field)
+	program = models.CharField(
+		max_length = 50,
+		validators = [RegexValidator(r'^[a-zA-Z]*$', 'Only alphabetic characters allowed')]
+	)
+	def __unicode__(self):
+		return self.program
+
+	# Years experience (in Industry)
+	years_experience = models.PositiveIntegerField()
+	def __unicode__(self):
+		return self.years_experience
+	
+	#
+	# The following pertain to a most recent, relevant job
+	#
+
+	# Most relevant job employer
+	relevant_job_employer = models.CharField(
+		max_length = 50
+	)
+	def __unicode__(self):
+		return self.recent_employer
+
+	# Most relevant job title
+	relevant_job_title = models.CharField(
+		max_length = 50
+	)
 
 	# Allow many-to-one relation between candidate and interview
 	pass
@@ -125,6 +184,7 @@ class Recruiter(models.Model):
 	def __unicode__(self):
 		return self.title
 
+
 	# Allow many-to-one relation between recruiter and interview
 	pass
 
@@ -155,7 +215,19 @@ class Interview(models.Model):
 	def __unicode__(self):
 		return self.recruiter
 	
-	
+	# Interview start time
+	start_time = models.DateTimeField()
+	def __unicode__(self):
+		return self.start_time
+
+	# Interview end time
+	end_time = models.DateTimeField()
+	def __unicode__(self):
+		return self.end_time
+
+	# Allow many-to-one relation between intervie and surveys/transcript/feedback
+	pass
+
 ##
 ## Interview sub-tables
 ##
@@ -175,6 +247,55 @@ class PreSurvey(models.Model):
 	def __unicode__(self):
 		return self.interview
 
+	# Predefine possible response in pre-survey
+	RESPONSES = (
+		(1, 'Strongly disagree'),
+		(2, 'Disagree'),
+		(3, 'Neutral'),
+		(4, 'Agree'),
+		(5, 'Strongly Agree')
+	)
+
+	# Question 1
+	question_one_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_one_response
+
+	# Question 2
+	question_two_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_two_response
+
+	# Question 3
+	question_three_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_three_response
+
+	# Question 4
+	question_four_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_four_response
+
+	# Question 5
+	question_five_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_five_response
+
 # Post-interview survey
 class PostSurvey(models.Model):
 	# Key field def
@@ -189,6 +310,56 @@ class PostSurvey(models.Model):
 	)
 	def __unicode__(self):
 		return self.interview
+
+	# Predefine possible response in post-survey
+	RESPONSES = (
+		(1, 'Strongly disagree'),
+		(2, 'Disagree'),
+		(3, 'Neutral'),
+		(4, 'Agree'),
+		(5, 'Strongly Agree')
+	)
+
+	# Question 1
+	question_one_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_one_response
+
+	# Question 2
+	question_two_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_two_response
+
+	# Question 3
+	question_three_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_three_response
+
+	# Question 4
+	question_four_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_four_response
+
+	# Question 5
+	question_five_response = models.CharField(
+		max_length = 1,
+		choices = RESPONSES
+	)
+	def __unicode__(self):
+		return self.question_five_response
+
 
 # Interview/screening transcripts
 class Transcript(models.Model):
@@ -205,6 +376,31 @@ class Transcript(models.Model):
 	def __unicode__(self):
 		return self.interview	
 
+	# Possible speakers
+	SPEAKERS = (
+		('C', 'Candidate'),
+		('R', 'Recruiter')
+	)
+
+	# Speaker
+	speaker = models.CharField(
+		max_length = 1,
+		choices = SPEAKERS
+	)
+	def __unicode__(self):
+		return self.speaker
+
+	# Line number (utterance number)
+	line_number = models.PositiveIntegerField()
+	def __unicode__(self):
+		return self.line_number
+
+	# Line contents (words spoken in utterance)
+	line_contents = models.CharField(
+		max_length = 2000
+	)
+	def __unicode__(self):
+		return self.line_contents
 
 # Interview feedback fields
 class Feedback(models.Model):
@@ -219,4 +415,26 @@ class Feedback(models.Model):
 		on_delete = models.CASCADE
 	)
 	def __unicode__(self):
-		return self.interview	
+		return self.interview
+
+	# Define possible feedback targets
+	FEEDBACK_TARGETS = (
+		('R', 'Recruiter'),
+		('C', 'Candidate'),
+		('S', 'System')
+	)
+
+	# The target to which the feedback text is displayed/sent
+	feedback_target = models.CharField(
+		max_length=1, 
+		choices = FEEDBACK_TARGETS
+	)
+	def __unicode__(self):
+		return self.feedback_target
+
+	# Human-readable text of interview feedback
+	feedback_contents = models.CharField(
+		max_length = 500, # Arbitrary, subject to reevaluation
+		)
+	def __unicode__(self):
+		return self.feedback_contents
