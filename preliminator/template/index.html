@@ -6,27 +6,58 @@
 <!--<img src="/static/media/blueprint_wide.jpg"/>-->
 <head>
     <!-- Title pending for webstore name -->
-    <title>Preliminator Demo</title>           
-	<!--<link rel="stylesheet" type="text/css" href= "/static/css/style.css" media = "screen" />-->
+    <title>Preliminator Demo</title> 
+	<link rel="stylesheet" href="/static/css/Colourise.css" type="text/css" media = "screen"/>
  	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  	 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  	
+ 	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
 </head>
 
 <body class="align">
-	<div class="site__container">
-	<div class="grid__container">
-    
-    <div id = "header">
-		<h1>Preliminator Demo: Index Placeholder </h1>
-	</div>
+<div id = "wrap">
+	<div id="header">
+	    <h1 id="logo-text"><a href="#">Preliminator</a></h1>
+	    <p id="intro"> [Product Statement] "A new way of recruiting." </p>
+	    <div  id="nav">
+	      <ul>
+	        <li id="current"><a href="#">Home</a></li>
+	        <li><a href="style.html">Sign In</a></li>
+	        <li><a href="#">Configuration</a></li>
+	      </ul>
+	    </div>
+	    
+  </div>
 
-	<div id = "subheader">
-		<h2>For Demo Users</h2>	
-	</div>
+   <div id="content-wrap">
+    <div id="main"> <a name="Preliminator Demo"></a>
+      <h2><a href="#">Preliminator Demo</a></h2>
+      <h3>About the Preliminator Demo</h3>
+      <p><a href="#"><img src="/static/media/firefox-gray.jpg" width="100" height="120" alt="" class="float-left" /></a> [Generalized description of Preliminator goals and use ases, as well as demo-related constraints.] </p>
+      <blockquote>
+        <p> "A semi famous quote" </p>
+        <p class="align-right"> - A Minor Celebrity </p>
+      </blockquote>
 
-	<div id = "index body">
-		<p><a href="/candidate_form">Candidate Form</a></p>
-		
-	</div>
 
+
+    </div>
+    <div id="sidebar">
+      <h3>Sidebar Menu</h3>
+      <ul class="sidemenu">
+        <li><a href="#">Home</a></li>
+        <li><a href="#">About Preliminator</a></li>
+        <li><a href="style.html">About the Team</a></li>
+    	</ul>
+    </div>
+  </div>	
+  <div>
+   <a href="/candidate_form" class = "button">
+      <span>Start Demo</span>
+      </a>
+      </div>
 </body>
 </html>
