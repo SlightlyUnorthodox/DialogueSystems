@@ -54,6 +54,8 @@ reflections = {
 
 #TODO finish filling in the q's
 # tbh no clue why the %1 is there, it was there in the eliza examples
+
+# the phrase after the letter "r" specifies what phrase we have identified that we want to respond to
 responses = (
 	(r'Teamwork (.*)',
 	  ("Talk about a time when you had to work closely with someone whose personality was very different from yours. How did you handle it %1?",
@@ -90,10 +92,10 @@ responses = (
 		)
 	),
 
-	(r'FieldConfirmation (.*)',
-		("Thank you, your answer has been noted %1.",
-		 "Great, we'll write that down %1.",
-		 "Ok, thank you for your response %1."
+	(r'Location Preference (.*)',
+		("Excellent, we think you will love %1.",
+		 "Great, %1.",
+		 "You can't go wrong living in %1."
 		)
 	)
 )
