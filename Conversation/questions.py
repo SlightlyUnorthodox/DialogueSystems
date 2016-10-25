@@ -10,6 +10,13 @@
 # categories are teamwork, Client-Facing Skills, Adapting,
 # Time management, and Communication
 
+#A Frame is a script-like conceptual structure that describes a 
+#particular type of situation, object, or event along with the participants 
+#and props that are needed for that Frame. For example, the "Apply_heat" 
+#frame describes a common situation involving a Cook, some Food, and a Heating_Instrument, 
+#and is evoked by words such as bake, blanch, boil, broil, brown, simmer, steam, etc.
+
+
 #TODO finish filling in the q's
 # tbh no clue why the %1 is there, it was there in the eliza examples
 responses = (
