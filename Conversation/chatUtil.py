@@ -1,3 +1,36 @@
+
+# pulled from this url, will change later after basic model works
+#http://www.nltk.org/_modules/nltk/chat/util.html#Chat
+
+
+# reflections take in user utterances and chooses what
+# words to swap out during the answer
+# i.e. If te candidate says "I am a junior in high school"
+# then the system would swap out "i am" for "you are" in the
+# response so the resonse would be something like
+# "you are a junior in high school, thank you for your response"
+# obviously we would like the convo to sound as natural as possible
+
+reflections = {
+  "i am"       : "you are",
+  "i was"      : "you were",
+  "i"          : "you",
+  "i'm"        : "you are",
+  "i'd"        : "you would",
+  "i've"       : "you have",
+  "i'll"       : "you will",
+  "my"         : "your",
+  "you are"    : "I am",
+  "you were"   : "I was",
+  "you've"     : "I have",
+  "you'll"     : "I will",
+  "your"       : "my",
+  "yours"      : "mine",
+  "you"        : "me",
+  "me"         : "you"
+}
+
+
 # so i am aware this file has no structure or anything
 # this eventually could be the file where we link 
 # the responses and questions to the rest of the code
@@ -10,12 +43,14 @@
 # categories are teamwork, Client-Facing Skills, Adapting,
 # Time management, and Communication
 
+# MAIN IDEA
 #A Frame is a script-like conceptual structure that describes a 
 #particular type of situation, object, or event along with the participants 
 #and props that are needed for that Frame. For example, the "Apply_heat" 
 #frame describes a common situation involving a Cook, some Food, and a Heating_Instrument, 
 #and is evoked by words such as bake, blanch, boil, broil, brown, simmer, steam, etc.
 
+#my thought is we treat each step in the interview as a frame. 
 
 #TODO finish filling in the q's
 # tbh no clue why the %1 is there, it was there in the eliza examples
