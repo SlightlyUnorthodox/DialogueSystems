@@ -32,10 +32,11 @@ class CandidateForm(forms.Form):
 		('N', 'Not Complete')
 	)
 
-	educationStatus = forms.ChoiceField(choics = EDU_STATUS, label = 'Education Status', required = True)
-	programField = forms.CharField(label = 'Major/Field', min_length = 1, max_length = 50, required = True)
+	educationStatus = forms.ChoiceField(choices = EDU_STATUS, label = 'Education Status', required = True)
+	programField = forms.CharField(label = 'Major/Field', min_length = 1, max_length = 50, required = False)
 	yearsExperience = forms.IntegerField(label = 'Years Experience', min_value = 1, max_value = 20, required = True)
-	relevantEmployer = forms.CharField(label = 'Relevant Employer', min_length = 1, max_length = 50, required = True)
+	relevantEmployer = forms.CharField(label = 'Relevant Employer', min_length = 1, max_length = 50, required = False)
+	relevantTitle = forms.CharField(label = 'Relevant Job Title', min_length = 1, required = False)
 
 #Recruiter information
 class RecruiterForm(forms.Form):

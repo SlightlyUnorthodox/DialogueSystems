@@ -8,4 +8,6 @@ urlpatterns = [
 	url(r'^candidate_form', views.candidate_form, name = 'candidate_form'),
 	url(r'^interview_page', views.interview_page, name = 'interview_page'),
 	url(r'^feedback_page', views.feedback_page, name = 'feedback_page'),
+	url(r'^pre_survey', views.pre_survey, name = 'pre_survey'),
+	url(r'^post_survey', views.post_survey, name = 'post_survey'),
 ]

@@ -19,8 +19,8 @@ class User(models.Model):
 	username = models.CharField(
 		"Username",
 		max_length = 50, 
-		validators = [MinLengthValidator(8, "Your username must contain at least 8 characters.")],
-		unique = True
+		validators = [MinLengthValidator(8, "Your username must contain at least 8 characters.")]#,
+		#unique = True
 		)
 	def __unicode__(self):
 		return self.username

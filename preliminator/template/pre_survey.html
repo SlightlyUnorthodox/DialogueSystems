@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<!-- Author: Dax Gerts
+  Date: October 23rd, 2016
+  Description: Candidate form placeholder for Preliminator demo -->
+<!--<img src="/static/media/blueprint_wide.jpg"/>-->
+<head>
+    <!-- Title pending for webstore name -->
+    <title>Preliminator Demo</title>           
+  <!--<link rel="stylesheet" type="text/css" href= "/static/css/style.css" media = "screen" />-->
+  
+</head>
+
+<body class="align">
+  <div class="site__container">
+  <div class="grid__container">
+    
+    <div id = "header">
+    <h1>Preliminator Demo: Interview Pre-Survey</h1>
+    </div>
+
+  <h1>Survey</h1>
+    {{ state }}
+     <form action="/pre_survey/" method="post" class="form form--login"/>{% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}"/>
+    {% endif %}
+
+    {{ form.non_field_errors}}
+    <div class="form__field">
+          {{ form.questionOneResponse.errors }}
+          {{ form.questionOneResponse.label_tag }}
+          <label class="fontawesome-user" for="survey_questionOneResponse"><span class="hidden">Question 1: [Enter Question 1 Here]</span></label>
+          {{ form.questionOneResponse}}
+        </div>
+
+    <div class="form__field">
+          {{ form.questionTwoResponse.errors }}
+          {{ form.questionTwoResponse.label_tag }}
+          <label class="fontawesome-user" for="survey_questionTwoResponse"><span class="hidden">Question 2: [Enter Question 2 Here]</span></label>
+          {{ form.questionTwoResponse}}
+        </div>
+
+    <div class="form__field">
+          {{ form.questionThreeResponse.errors }}
+          {{ form.questionThreeResponse.label_tag }}
+          <label class="fontawesome-user" for="survey_questionThreeResponse"><span class="hidden">Question 3: [Enter Question 3 Here]</span></label>
+          {{ form.questionThreeResponse}}
+        </div>
+
+        <div class="form__field">
+          {{ form.questionFourResponse.errors }}
+          {{ form.questionFourResponse.label_tag }}
+          <label class="fontawesome-user" for="survey_questionFourResponse"><span class="hidden">Question 4: [Enter Question 4 Here]</span></label>
+          {{ form.questionFourResponse}}
+        </div>
+
+        <div class="form__field">
+          {{ form.questionFiveResponse.errors }}
+          {{ form.questionFiveResponse.label_tag }}
+          <label class="fontawesome-user" for="survey_questionFiveResponse"><span class="hidden">Question 5: [Enter Question 5 Here]</span></label>
+          {{ form.questionFiveResponse}}
+        </div>
+
+    <div class="form__field">
+          <input type="submit" value="Go To Candidate Form"/>
+        </div>
+
+  </form>
+
+</body>
+</html>

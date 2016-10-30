@@ -16,17 +16,78 @@
 	<div class="grid__container">
     
     <div id = "header">
-		<h1>Preliminator Demo: Candidate Form Placeholder </h1>
+		<h1>Preliminator Demo: Candidate Form </h1>
 	</div>
 
-	<div id = "subheader">
-		<h2>For Demo Users</h2>	
-	</div>
+	<h1>Candidate Information</h1>
+    {{ state }}
+     <form action="/candidate_form/" method="post" class="form form--login"/>{% csrf_token %}
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}"/>
+    {% endif %}
 
-	<div id = "index body">
-		<p><a href="/interview_page">Interview Page</a></p>
-		
-	</div>
+    {{ form.non_field_errors}}
+    <div class="form__field">
+          {{ form.firstName.errors }}
+          {{ form.firstName.label_tag }}
+          <label class="fontawesome-user" for="application__firstName"><span class="hidden">First Name</span></label>
+          {{ form.firstName}}
+        </div>
+
+    <div class="form__field">
+          {{ form.lastName.errors }}
+          {{ form.lastName.label_tag }}
+          <label class="fontawesome-lock" for="application__lastName"><span class="hidden">Last Name</span></label>
+          {{ form.lastName }}
+        </div>
+    
+    <div class="form__field">
+          {{ form.highestEducation.errors }}
+          {{ form.highestEducation.label_tag }}
+          <label class="fontawesome-lock" for="application__highestEducation"><span class="hidden">Highest Education Level</span></label>
+          {{ form.highestEducation }}
+        </div>
+    
+    <div class="form__field">
+          {{ form.educationStatus.errors }}
+          {{ form.educationStations.label_tag }}
+          <label class="fontawesome-lock" for="application__educationStatus"><span class="hidden">Education Status</span></label>
+          {{ form.educationStatus }}
+        </div>
+
+        <div class="form__field">
+          {{ form.programField.errors }}
+          {{ form.programField.label_tag }}
+          <label class="fontawesome-lock" for="application__programField"><span class="hidden">Program/Field</span></label>
+          {{ form.programField }}
+        </div>
+
+        <div class="form__field">
+          {{ form.yearsExperience.errors }}
+          {{ form.yearsExperience.label_tag }}
+          <label class="fontawesome-lock" for="application__yearsExperience"><span class="hidden">Years of Experience (In Field)</span></label>
+          {{ form.yearsExperience }}
+        </div>
+
+        <div class="form__field">
+          {{ form.relevantEmployer.errors }}
+          {{ form.relevantEmployer.label_tag }}
+          <label class="fontawesome-lock" for="application__relevantEmployer"><span class="hidden">Most Recent/Relevant Employer</span></label>
+          {{ form.relevantEmployer }}
+        </div>
+
+        <div class="form__field">
+          {{ form.relevantTitle.errors }}
+          {{ form.relevantTitle.label_tag }}
+          <label class="fontawesome-lock" for="application__relevantTitle"><span class="hidden">Most Recent/Relevant Job Title</span></label>
+          {{ form.relevantTitle }}
+        </div>
+
+    <div class="form__field">
+          <input type="submit" value="Start Screening Interview"/>
+        </div>
+
+  </form>
 
 </body>
 </html>
