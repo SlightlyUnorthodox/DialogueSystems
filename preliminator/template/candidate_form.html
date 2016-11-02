@@ -1,93 +1,145 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<!DOCTYPE HTML>
 <html lang="en">
-<!-- Author: Dax Gerts
-	Date: October 23rd, 2016
-	Description: Candidate form placeholder for Preliminator demo -->
+<!-- Sara Lichtenstein, Candidate Page -->
 <!--<img src="/static/media/blueprint_wide.jpg"/>-->
-<head>
-    <!-- Title pending for webstore name -->
-    <title>Preliminator Demo</title>           
-	<!--<link rel="stylesheet" type="text/css" href= "/static/css/style.css" media = "screen" />-->
- 	
-</head>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
 
-<body class="align">
-	<div class="site__container">
-	<div class="grid__container">
-    
-    <div id = "header">
-		<h1>Preliminator Demo: Candidate Form </h1>
-	</div>
+    <title>The Preliminator: Candidate Form</title>
 
-	<h1>Candidate Information</h1>
-    {{ state }}
-     <form action="/candidate_form/" method="post" class="form form--login"/>{% csrf_token %}
-    {% if next %}
-    <input type="hidden" name="next" value="{{ next }}"/>
-    {% endif %}
+    <!-- Bootstrap core CSS -->
+    <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
 
-    {{ form.non_field_errors}}
-    <div class="form__field">
-          {{ form.firstName.errors }}
-          {{ form.firstName.label_tag }}
-          <label class="fontawesome-user" for="application__firstName"><span class="hidden">First Name</span></label>
-          {{ form.firstName}}
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="jumbotron-narrow.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <!-- Static navbar -->
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">The Preliminator</a>
+          </div>
+
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li><a href="/index.html">Home</a></li>
+              <li><a href="#">Sign In</a></li>
+              <li class="active"><a href="/candidate_form.html">Demo</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#">Configuration<span class="sr-only">(current)</span></a></li>
+              <li><a href="/about_team.html">About the Team</a></li>
+              <li><a href="#">About the Preliminator</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
+
+      <div class="container">
+        <div class="jumbotron">
+          <h1>Welcome, Candidate</h1>
         </div>
+      </div>
+    <div class="container">
+      {{ state }}
+      <form action="/candidate_form/" method="post" class="form form--login"/>{% csrf_token %}
+      {% if next %}
+      <input type="hidden" name="next" value="{{ next }}"/>
+      {% endif %}
 
-    <div class="form__field">
-          {{ form.lastName.errors }}
-          {{ form.lastName.label_tag }}
-          <label class="fontawesome-lock" for="application__lastName"><span class="hidden">Last Name</span></label>
-          {{ form.lastName }}
-        </div>
-    
-    <div class="form__field">
-          {{ form.highestEducation.errors }}
-          {{ form.highestEducation.label_tag }}
-          <label class="fontawesome-lock" for="application__highestEducation"><span class="hidden">Highest Education Level</span></label>
-          {{ form.highestEducation }}
-        </div>
-    
-    <div class="form__field">
-          {{ form.educationStatus.errors }}
-          {{ form.educationStations.label_tag }}
-          <label class="fontawesome-lock" for="application__educationStatus"><span class="hidden">Education Status</span></label>
-          {{ form.educationStatus }}
-        </div>
+      {{ form.non_field_errors}}
+      <div class="form__field">
+        {{ form.firstName.errors }}
+        {{ form.firstName.label_tag }}
+        <label class="fontawesome-user" for="application__firstName"><span class="hidden">First Name</span></label>          {{ form.firstName}}
+      </div>
 
-        <div class="form__field">
-          {{ form.programField.errors }}
-          {{ form.programField.label_tag }}
-          <label class="fontawesome-lock" for="application__programField"><span class="hidden">Program/Field</span></label>
-          {{ form.programField }}
-        </div>
+      <div class="form__field">
+        {{ form.lastName.errors }}
+        {{ form.lastName.label_tag }}
+        <label class="fontawesome-lock" for="application__lastName"><span class="hidden">Last Name</span></label>
+        {{ form.lastName }}
+      </div>
+      
+      <div class="form__field">
+        {{ form.highestEducation.errors }}
+        {{ form.highestEducation.label_tag }}
+        <label class="fontawesome-lock" for="application__highestEducation"><span class="hidden">Highest Education Level</span></label>
+        {{ form.highestEducation }}
+        {{ form.educationStatus.errors }}
+        {{ form.educationStations.label_tag }}
+        <label class="fontawesome-lock" for="application__educationStatus"><span class="hidden">Education Status</span></label>
+        {{ form.educationStatus }}
+      </div>
 
-        <div class="form__field">
-          {{ form.yearsExperience.errors }}
-          {{ form.yearsExperience.label_tag }}
-          <label class="fontawesome-lock" for="application__yearsExperience"><span class="hidden">Years of Experience (In Field)</span></label>
-          {{ form.yearsExperience }}
-        </div>
+      <div class="form__field">
+        {{ form.programField.errors }}
+        {{ form.programField.label_tag }}
+        <label class="fontawesome-lock" for="application__programField"><span class="hidden">Program/Field</span></label>
+        {{ form.programField }}
+      </div>
 
-        <div class="form__field">
-          {{ form.relevantEmployer.errors }}
-          {{ form.relevantEmployer.label_tag }}
-          <label class="fontawesome-lock" for="application__relevantEmployer"><span class="hidden">Most Recent/Relevant Employer</span></label>
-          {{ form.relevantEmployer }}
-        </div>
+      <div class="form__field">
+        {{ form.yearsExperience.errors }}
+        {{ form.yearsExperience.label_tag }}
+        <label class="fontawesome-lock" for="application__yearsExperience"><span class="hidden">Years of Experience (In Field)</span></label>
+        {{ form.yearsExperience }}
+      </div>
 
-        <div class="form__field">
-          {{ form.relevantTitle.errors }}
-          {{ form.relevantTitle.label_tag }}
-          <label class="fontawesome-lock" for="application__relevantTitle"><span class="hidden">Most Recent/Relevant Job Title</span></label>
-          {{ form.relevantTitle }}
-        </div>
+      <div class="form__field">
+        {{ form.relevantEmployer.errors }}
+        {{ form.relevantEmployer.label_tag }}
+        <label class="fontawesome-lock" for="application__relevantEmployer"><span class="hidden">Most Recent/Relevant Employer</span></label>
+        {{ form.relevantEmployer }}
+      </div>
 
-    <div class="form__field">
-          <input type="submit" value="Start Screening Interview"/>
-        </div>
+      <div class="form__field">
+        {{ form.relevantTitle.errors }}
+        {{ form.relevantTitle.label_tag }}
+        <label class="fontawesome-lock" for="application__relevantTitle"><span class="hidden">Most Recent/Relevant Job Title</span></label>
+        {{ form.relevantTitle }}
+      </div>
 
+      <a href="/interview_page.html" input class="btn btn-primary" aria-pressed="true" type="submit">Start Screening Interview</a>
+    </div>
   </form>
-
-</body>
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
 </html>
