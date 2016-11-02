@@ -97,5 +97,35 @@ responses = (
 		 "Great, %1.",
 		 "You can't go wrong living in %1."
 		)
+	),
+
+	(r'I think (.*)',
+        ("That's a great opinion on that matter!",
+        "Glad to see your train of thought."
+        )
+    ),
+
+    (r'I\'m not sure ' (.*)',
+		("Don't worry about it, thanks for your honesty.",
+		 "It's ok, we just want to see your past experiences."
+		)
+	),
+
+	(r'how are you (.*)',
+		("Great, thank you for asking"
+		)
 	)
+
 )
+
+
+
+
+
+
+
+
+
+
+
+

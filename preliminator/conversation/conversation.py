@@ -2,7 +2,7 @@
 import chatUtil as util 
 
 class Conversation(object):
-	def __init__(self, pairs, reflections={}):
+	def __init__(self, responses, reflections={}):
         
         # below is pulled from the nltk documentation website
         # pairs is a list of patterns and its responses
@@ -42,6 +42,8 @@ class Conversation(object):
                 self.reflections[mo.string[mo.start():mo.end()]],
                     str.lower())
 
+
+    # finds the % in the responses to insert the new response
     def _wildcards(self, response, match):
         pos = response.find('%')
         while pos >= 0:
@@ -53,8 +55,7 @@ class Conversation(object):
         return response
 
 
-
-
+    # generates our string response
     def respond(self, str):
         """
         Generate a response to the user input.
