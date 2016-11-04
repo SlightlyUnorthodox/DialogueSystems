@@ -10,4 +10,5 @@ urlpatterns = [
 	url(r'^feedback_page', views.feedback_page, name = 'feedback_page'),
 	url(r'^pre_survey', views.pre_survey, name = 'pre_survey'),
 	url(r'^post_survey', views.post_survey, name = 'post_survey'),
+	url(r'^', views.index, name = 'index')
 ]

@@ -19,12 +19,32 @@
 		<h1>Preliminator Demo: Feedback Page Placeholder </h1>
 	</div>
 
-	<div id = "subheader">
-		<h2>For Demo Users</h2>	
-	</div>
+	<div ng-hide="">
+		{% if results %}
 
+		<table style="padding: 5px; font-size:150%" id="Products">
+
+		<tr style = "font: bold">
+		<th> Feedback ID </th>
+		<th> Feedback Target </th>
+		<th> Feedback Content </th>
+		</tr>
+
+		{% for f in feedback %}
+
+		<tr>
+		<td> {{ f.feedback_id }} </td>
+		<td> {{ f.feedback_target }} </td>
+		<td> {{ f.feedback_content }} </td>
+		</tr>
+
+		{% endfor %}
+		{% endif %}
+	</table>
+	</div>
+	
 	<div id = "index body">
-		<p><a href="/index">Return to Demo Index</a></p>
+		<p><a href="/post_survey.html">Return to Demo Index</a></p>
 		
 	</div>
 

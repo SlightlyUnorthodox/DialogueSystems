@@ -85,7 +85,8 @@ class Candidate(models.Model):
 	# Candidate's highest education level
 	highest_education = models.CharField(
 		max_length = 1,
-		choices = EDU_LEVELS
+		choices = EDU_LEVELS,
+		default = 'B'
 	)
 	def __unicode__(self):
 		return self.highest_education
@@ -100,7 +101,8 @@ class Candidate(models.Model):
 	# Candidate's education status
 	education_status = models.CharField(
 		max_length = 1,
-		choices = EDU_STATUS
+		choices = EDU_STATUS,
+		default = 'I'
 	)
 	def __unicode__(self):
 		return self.education_status
@@ -259,7 +261,8 @@ class PreSurvey(models.Model):
 	# Question 1
 	question_one_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_one_response
@@ -267,7 +270,8 @@ class PreSurvey(models.Model):
 	# Question 2
 	question_two_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_two_response
@@ -275,7 +279,8 @@ class PreSurvey(models.Model):
 	# Question 3
 	question_three_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_three_response
@@ -283,7 +288,8 @@ class PreSurvey(models.Model):
 	# Question 4
 	question_four_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_four_response
@@ -291,7 +297,8 @@ class PreSurvey(models.Model):
 	# Question 5
 	question_five_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_five_response
@@ -323,7 +330,8 @@ class PostSurvey(models.Model):
 	# Question 1
 	question_one_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_one_response
@@ -331,7 +339,8 @@ class PostSurvey(models.Model):
 	# Question 2
 	question_two_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_two_response
@@ -339,7 +348,8 @@ class PostSurvey(models.Model):
 	# Question 3
 	question_three_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_three_response
@@ -347,7 +357,8 @@ class PostSurvey(models.Model):
 	# Question 4
 	question_four_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_four_response
@@ -355,7 +366,8 @@ class PostSurvey(models.Model):
 	# Question 5
 	question_five_response = models.CharField(
 		max_length = 1,
-		choices = RESPONSES
+		choices = RESPONSES,
+		default = 3
 	)
 	def __unicode__(self):
 		return self.question_five_response
@@ -427,7 +439,8 @@ class Feedback(models.Model):
 	# The target to which the feedback text is displayed/sent
 	feedback_target = models.CharField(
 		max_length=1, 
-		choices = FEEDBACK_TARGETS
+		choices = FEEDBACK_TARGETS,
+		default = 'C'
 	)
 	def __unicode__(self):
 		return self.feedback_target

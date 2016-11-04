@@ -15,7 +15,7 @@ import datetime
 import decimal
 
 #import necessary models and forms
-from .models import Candidate, Interview, User, Recruiter
+from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 from .forms import CandidateForm, PreSurveyForm, PostSurveyForm
 
 def index(request):
@@ -46,6 +46,7 @@ def initialize_interview(user, candidate):
 	newInterview.save()
 
 	return(newInterview)
+
 ##
 ##
 ##
@@ -119,9 +120,10 @@ def candidate_form(request):
 
 			# Initialize interview
 			interview =	initialize_interview(newDemoUser, newDemoCandidate)
-
+			print(interview)
+			print(interview.interview_id)
 			# Redirect user to next page
-			return render(request, 'interview_page.html', {'form':form, 'state':state, 'interview': interview})
+			return render(request, 'interview_page.html', {'form':form, 'state':state})
 
 			# TODO: Confirm if using pre-survey
 			# return render(request, 'pre_survey.html', {'form': form, 'state': state, 'interview': interview})
@@ -133,15 +135,17 @@ def candidate_form(request):
 	state = "Please enter candidate information"
 	return render(request, 'candidate_form.html', {'form':form, 'state':state})
 
-def feedback_page(request):
-	template = loader.get_template('feedback_page.html')
-	context = RequestContext(request)
-	return HttpResponse(template.render(context))
-
 def interview_page(request):
-	template = loader.get_template('interview_page.html')
-	context = RequestContext(request)
-	return HttpResponse(template.render(context))
+
+	return render(request, 'interview_page.html')
+
+def feedback_page(request):
+	
+	print (request['interview'])
+	#request['feedback'] = Feedback.objects.get(interview = request['interview'])
+	#template = loader.get_template('feedback_page.html')
+
+	return render(request, 'feedback_page.html')
 
 
 @csrf_exempt

@@ -24,7 +24,7 @@ class CandidateForm(forms.Form):
 		('D', 'Doctorate Degree')
 	)
 
-	highestEducation = forms.ChoiceField(choices = EDU_LEVELS, label = 'Highest Education Level', required = True)
+	highestEducation = forms.ChoiceField(choices = EDU_LEVELS, label = 'Highest Education Level', required = True, initial =  'B')
 	
 	# Education status levels
 	EDU_STATUS = (
@@ -33,7 +33,8 @@ class CandidateForm(forms.Form):
 		('N', 'Not Complete')
 	)
 
-	educationStatus = forms.ChoiceField(choices = EDU_STATUS, label = 'Education Status', required = True)
+	educationStatus = forms.ChoiceField(choices = EDU_STATUS, label = 'Education Status', required = True, initial =  'I')
+
 	programField = forms.CharField(label = 'Major/Field', min_length = 1, max_length = 50, required = False)
 	yearsExperience = forms.IntegerField(label = 'Years Experience', min_value = 1, max_value = 20, required = True)
 	relevantEmployer = forms.CharField(label = 'Relevant Employer', min_length = 1, max_length = 50, required = False)
@@ -58,11 +59,11 @@ class PreSurveyForm(forms.Form):
 		(5, 'Strongly Agree')
 	)
 
-	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question One Response', required = True)
-	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Two Response', required = True)
-	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Three Response', required = True)
-	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Four Response', required = True)
-	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Five Response', required = True)
+	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question One Response', required = True, initial =  3)
+	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Two Response', required = True, initial =  3)
+	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Three Response', required = True, initial =  3)
+	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Four Response', required = True, initial =  3)
+	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Five Response', required = True, initial =  3)
 
 #PostSurvey
 class PostSurveyForm(forms.Form):
@@ -76,11 +77,11 @@ class PostSurveyForm(forms.Form):
 		(5, 'Strongly Agree')
 	)
 
-	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question One Response', required = True)
-	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Two Response', required = True)
-	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Three Response',required = True)
-	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Four Response', required = True)
-	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Five Response', required = True)
+	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question One Response', required = True, initial =  3)
+	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Two Response', required = True, initial =  3)
+	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Three Response',required = True, initial =  3)
+	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Four Response', required = True, initial =  3)
+	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Five Response', required = True, initial =  3)
 
 #Transcript
 class TranscriptForm(forms.Form):
