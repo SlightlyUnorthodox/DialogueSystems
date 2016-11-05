@@ -1,17 +1,29 @@
 // method to dynamically add javascript into the interview page chat box
 // user will be 0 for interviewer and 1 for candidate
-function create(htmlStr, textToAdd, user) {
+
+// build fragment and then add it to the document of interest
+//var myLink = document.getElementById('clickMe');
+
+function populate(textToPrint){
+  alert(textToPrint);
+}
+
+/*
+function populate(htmlStr, textToAdd, user) {
     var frag = document.createDocumentFragment(),
         temp = document.createElement('div');
     
+    // pulling the div tag to add to
+    var divNeeded = document.getElementById("add-messages");
+
     // automatically changes the html to add
-    temp.innerHTML = htmlStr;
+    //temp.innerHTML = htmlStr;
     
-    while (temp.firstChild) {
-        frag.appendChild(temp.firstChild);
-      }
-        return frag;
-    }
+    //while (temp.firstChild) {
+    //    frag.appendChild(temp.firstChild);
+    //  }
+    //    return frag;
+    //}
 
     // the intro to each message added into the chat conversation
     var introString = '<li class="media"><div class="media-body"><div class="media">';
@@ -35,9 +47,10 @@ function create(htmlStr, textToAdd, user) {
         console.log('yo you fucked up')
     }
 
+    // next step divNeeded.appendChild(fragment)
 
     document.getElementById("add-messages").appendChild(fragment);     
     //document.body.insertBefore(fragment, document.body.childNodes[0]);
 
-
+*/
 
