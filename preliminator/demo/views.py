@@ -50,12 +50,16 @@ def initialize_interview(user, candidate):
 		end_time = start_time)
 	newInterview.save()
 
-	return(newInterview)
+	# Set interview id global
+	global interview_id
+	interview_id = newInterview.interview_id
 
+	return(interview_id)
 ##
 ##
 ##
 
+#
 # 1. Candidate Form - enter generic information for use in interview
 @csrf_exempt
 def candidate_form(request):
@@ -119,15 +123,20 @@ def candidate_form(request):
 
 			newDemoCandidate.save()
 
+			# Save candidate as global candidate
+			global candidate_id
+			candidate_id = newDemoCandidate.candidate_id
+
 			# Confirm successfuly creation of new user
 			print("Log: new candidate successfully created")
 			state = "Application submitted. Proceed to next page."
 
 			# Initialize interview
-			interview =	initialize_interview(newDemoUser, newDemoCandidate)
-	
+			initialize_interview(newDemoUser, newDemoCandidate)
+			print("GLOBAL INTERVIEW ID: " + str(interview_id))
+
 			# Redirect user to next page
-			return render(request, 'pre_survey.html', {'state': state, 'interview': interview})
+			return HttpResponseRedirect('/pre_survey/')
 	else:
 		# Initialize candidate form
 		form = CandidateForm()
@@ -137,21 +146,22 @@ def candidate_form(request):
 	return render(request, 'candidate_form.html', {'form':form, 'state':state})
 
 # 2. Pre Survey - pre-dialogue user satisfaction/outlook survey
-@csrf_exempt
 def pre_survey(request):
-
 	# Initialize candidate model variables
 	questionOneResponse = questionTwoResponse = questionThreeResponse = questionFourResponse = questionFiveResponse = ''
-	print("check1")
+
 	# Check if POST request was made
 	if request.method == 'POST':
-		print("check2")
 		# Validate candidate form
 		form = PreSurveyForm(request.POST)
 		if form.is_valid():
 
+			# Get interview instance
+			print("Checking interview_id: " + str(interview_id))
+
+			current_interview_obj = Interview.objects.get(interview_id = int(interview_id))
+
 			# Handle form input
-			print("check3")
 			# Question 1
 			questionOneResponse = request.POST.get('questionOneResponse')
 
@@ -168,9 +178,8 @@ def pre_survey(request):
 			questionFiveResponse = request.POST.get('questionFiveResponse')
 
 			# Save new candidate
-			print(request.session.get('interview', None))
 			newPreSurvey = PreSurvey(
-				interview = request.session.get('interview', None),
+				interview = current_interview_obj,
 				question_one_response = questionOneResponse,
 				question_two_response = questionTwoResponse,
 				question_three_response = questionThreeResponse,
@@ -185,17 +194,30 @@ def pre_survey(request):
 			state = "Survey submitted. Proceed to next page."
 
 			# Redirect user to next page
-			return render(request, 'interview_page.html', {'form':form, 'state':state, 'interview': request.session.get('interview', None)})
+
+			return HttpResponseRedirect('/interview_page/')
+			#return render(request, 'interview_page.html', {'form':form, 'state':state, 'interview': request.session.get('interview', None)})
 	else:
 		# Initialize candidate form
 		form = PostSurveyForm()
 
 	# Cycle initialized form
 	state = "Please enter pre-screening survey information"
-	return render(request, 'pre_survey.html', {'form':form, 'state':state, 'interview': request.session.get('interview', None)})
+	return render(request, 'pre_survey.html', {'form':form, 'state':state})
 
 # 3. Interview Page - hosts dialogue for interview
 def interview_page(request):
+
+	# Confirm candidate and interview info forwarding
+	candidate = Candidate.objects.get(candidate_id = int(candidate_id))
+	interview = Interview.objects.get(interview_id = int(interview_id))
+
+	print(candidate.first_name)
+	print(candidate.last_name)
+	print(candidate.highest_education)
+
+	print(interview.start_time)
+	print(interview.end_time)
 
 	return render(request, 'interview_page.html', {'interview':request.session.get('interview', None)})
 
