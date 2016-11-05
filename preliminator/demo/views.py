@@ -10,6 +10,7 @@ from django.views.generic import FormView
 from django.core.urlresolvers import reverse
 from django.db.models import Max
 from django.core.mail import EmailMessage
+from django.utils import dateformat
 
 import datetime
 import decimal
@@ -39,10 +40,14 @@ def initialize_interview(user, candidate):
 	newRecruiter.save()
 
 	# Initialize Interview
+	start_time = datetime.datetime.now()
+	start_time = start_time.strftime("%Y-%m-%d %H:%M")
+
 	newInterview = Interview(
 		candidate = candidate,
 		recruiter = newRecruiter,
-		start_time = datetime.datetime.now())
+		start_time = start_time,
+		end_time = start_time)
 	newInterview.save()
 
 	return(newInterview)
@@ -51,18 +56,18 @@ def initialize_interview(user, candidate):
 ##
 ##
 
+# 1. Candidate Form - enter generic information for use in interview
 @csrf_exempt
 def candidate_form(request):
 	# Initialize candidate model variables
 	newFirstName = newLastName = newHighestEducation = newEducationStatus = newProgramField = newYearsExperience = newRelevantEmployer = ''
-
+	
 	# Check if POST request was made
 	if request.method == 'POST':
 
 		# Validate candidate form
 		form = CandidateForm(request.POST)
 		if form.is_valid():
-
 			# Handle form input
 
 			# First name
@@ -101,7 +106,7 @@ def candidate_form(request):
 			newDemoUser.save()
 
 			# Save new candidate
-			newCandidate = Candidate(
+			newDemoCandidate = Candidate(
 				user = newDemoUser,
 				first_name = newFirstName,
 				last_name = newLastName,
@@ -112,7 +117,7 @@ def candidate_form(request):
 				relevant_job_employer = newRelevantEmployer,
 				relevant_job_title = newRelevantJobTitle)
 
-			newCandidate.save()
+			newDemoCandidate.save()
 
 			# Confirm successfuly creation of new user
 			print("Log: new candidate successfully created")
@@ -120,13 +125,9 @@ def candidate_form(request):
 
 			# Initialize interview
 			interview =	initialize_interview(newDemoUser, newDemoCandidate)
-			print(interview)
-			print(interview.interview_id)
+	
 			# Redirect user to next page
-			return render(request, 'interview_page.html', {'form':form, 'state':state})
-
-			# TODO: Confirm if using pre-survey
-			# return render(request, 'pre_survey.html', {'form': form, 'state': state, 'interview': interview})
+			return render(request, 'pre_survey.html', {'state': state, 'interview': interview})
 	else:
 		# Initialize candidate form
 		form = CandidateForm()
@@ -135,33 +136,22 @@ def candidate_form(request):
 	state = "Please enter candidate information"
 	return render(request, 'candidate_form.html', {'form':form, 'state':state})
 
-def interview_page(request):
-
-	return render(request, 'interview_page.html')
-
-def feedback_page(request):
-	
-	print (request['interview'])
-	#request['feedback'] = Feedback.objects.get(interview = request['interview'])
-	#template = loader.get_template('feedback_page.html')
-
-	return render(request, 'feedback_page.html')
-
-
+# 2. Pre Survey - pre-dialogue user satisfaction/outlook survey
 @csrf_exempt
 def pre_survey(request):
+
 	# Initialize candidate model variables
 	questionOneResponse = questionTwoResponse = questionThreeResponse = questionFourResponse = questionFiveResponse = ''
-
+	print("check1")
 	# Check if POST request was made
 	if request.method == 'POST':
-
+		print("check2")
 		# Validate candidate form
 		form = PreSurveyForm(request.POST)
 		if form.is_valid():
 
 			# Handle form input
-
+			print("check3")
 			# Question 1
 			questionOneResponse = request.POST.get('questionOneResponse')
 
@@ -178,8 +168,9 @@ def pre_survey(request):
 			questionFiveResponse = request.POST.get('questionFiveResponse')
 
 			# Save new candidate
+			print(request.session.get('interview', None))
 			newPreSurvey = PreSurvey(
-				interview = interview,
+				interview = request.session.get('interview', None),
 				question_one_response = questionOneResponse,
 				question_two_response = questionTwoResponse,
 				question_three_response = questionThreeResponse,
@@ -194,15 +185,26 @@ def pre_survey(request):
 			state = "Survey submitted. Proceed to next page."
 
 			# Redirect user to next page
-			return render(request, 'candidate_form.html', {'form':form, 'state':state})
+			return render(request, 'interview_page.html', {'form':form, 'state':state, 'interview': request.session.get('interview', None)})
 	else:
 		# Initialize candidate form
 		form = PostSurveyForm()
 
 	# Cycle initialized form
 	state = "Please enter pre-screening survey information"
-	return render(request, 'pre_survey.html', {'form':form, 'state':state})
+	return render(request, 'pre_survey.html', {'form':form, 'state':state, 'interview': request.session.get('interview', None)})
 
+# 3. Interview Page - hosts dialogue for interview
+def interview_page(request):
+
+	return render(request, 'interview_page.html', {'interview':request.session.get('interview', None)})
+
+# 4. Feedback Page - provides dialogue feedback for candidate and recruiter
+def feedback_page(request):
+	
+	return render(request, 'feedback_page.html', {'interview':request.session.get('interview', None)})
+
+# 5. Post Survey - post-dialogue user satisfaction survey
 @csrf_exempt
 def post_survey(request):
 	# Initialize candidate model variables
