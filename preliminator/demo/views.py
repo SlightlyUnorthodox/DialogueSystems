@@ -61,7 +61,6 @@ def initialize_interview(user, candidate):
 
 #
 # 1. Candidate Form - enter generic information for use in interview
-@csrf_exempt
 def candidate_form(request):
 	# Initialize candidate model variables
 	newFirstName = newLastName = newHighestEducation = newEducationStatus = newProgramField = newYearsExperience = newRelevantEmployer = ''
@@ -227,7 +226,6 @@ def feedback_page(request):
 	return render(request, 'feedback_page.html', {'interview':request.session.get('interview', None)})
 
 # 5. Post Survey - post-dialogue user satisfaction survey
-@csrf_exempt
 def post_survey(request):
 	# Initialize candidate model variables
 	questionOneResponse = questionTwoResponse = questionThreeResponse = questionFourResponse = questionFiveResponse = ''
@@ -258,7 +256,7 @@ def post_survey(request):
 
 			# Save new candidate
 			newPostSurvey = PostSurvey(
-				interview = interview,
+				interview = Interview.objects.get(interview_id = int(interview_id)),
 				question_one_response = questionOneResponse,
 				question_two_response = questionTwoResponse,
 				question_three_response = questionThreeResponse,
