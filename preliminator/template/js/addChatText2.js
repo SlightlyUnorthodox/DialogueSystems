@@ -22,34 +22,31 @@ function pop(user){
     // this is where we want to add in the html
     var divNeeded = document.getElementById("add-messages");
 
+
     // to add in the correct values, probably a better way but eh, i dont know javascript
     // defne each inner tag as its own document element
-    var newList = document.createElement('li');
-    newList.className = "media";
-    frag.appendChild(newList);
+    var chatEntry = document.createElement('div');
+    chatEntry.className = "chatEntry";
 
-    var mediaBodyDiv = document.createElement('div');
-    mediaBodyDiv.className = "media-body";
-    newList.appendChild(mediaBodyDiv);
+    var chatBoxLeft = document.createElement('div');
+    chatBoxLeft.className = "chat-box-left";
+    chatBoxLeft.innerHTML = inputString;
 
-    var mediaDiv = document.createElement('div');
-    mediaDiv.className = "media";
-    mediaBodyDiv.appendChild(mediaDiv);
-
-    var aTag = document.createElement('a');
-    aTag.className = "pull-left";
-    aTag.href = "#";
-    mediaDiv.appendChild(aTag);
-
-    var mediaBodyDiv2 = document.createElement('div');
-    mediaBodyDiv2.className = "media-body";
-    mediaBodyDiv2.innerHTML = inputString;
-    mediaDiv.appendChild(mediaBodyDiv2);
+    var chatBoxNameLeft = document.createElement('div');
+    chatBoxNameLeft.className = "chat-box-name-left";
 
     var imgTag = document.createElement('img');
-    imgTag.className = "media-object img-circle";
-    imgTag.src = "../bootstrap-chat-example/assets/img/interviewer.png";
-    aTag.appendChild(imgTag);
+    imgTag.src = "../chat-box/assets/img/user.png";
+    imgTag.alt = "bootstrap Chat box user image";
+    imgTag.className = "img-circle";
+    chatBoxNameLeft.appendChild(imgTag);
+
+    var hr = document.createElement('hr');
+    hr.className = "hr-class";
+
+    chatEntry.appendChild(chatBoxLeft);
+    chatEntry.appendChild(chatBoxNameLeft);
+    chatEntry.appendChild(hr);
 
     // now that the nesting of tags is taken care of, add into html
     divNeeded.appendChild(frag);
