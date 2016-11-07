@@ -27,6 +27,7 @@ function pop(user){
     // defne each inner tag as its own document element
     var chatEntry = document.createElement('div');
     chatEntry.className = "chatEntry";
+    frag.appendChild(chatEntry);
 
     var chatBoxLeft = document.createElement('div');
     chatBoxLeft.className = "chat-box-left";
