@@ -1,7 +1,13 @@
 # brings the pieces together
 import chatUtil as util 
 
+# creates the conversation class that will pass along the information we need
+
+
+
 class Conversation(object):
+    generatedString = "";
+
 	def __init__(self, responses, reflections={}):
         
         # below is pulled from the nltk documentation website
@@ -79,4 +85,42 @@ class Conversation(object):
                 if resp[-2:] == '??': resp = resp[:-2] + '?'
                 return resp
 
+
     # Hold a conversation with a chatbot
+
+    def converse(self, quit="quit"):
+        input = ""
+        while input != quit:
+            input = quit
+            try: input = compat.raw_input(">")
+            except EOFError:
+                print(input)
+            if input:
+                while input[-1] in "!.": input = input[:-1]
+                print(self.respond(input))
+
+
+    # create string that needs to be passed to the chat bot via a .js file
+    # standy for bugs
+    def createJS():
+        return generatedString;
+    # Hold a conversation with a chatbot
+
+
+
+eliza_chatbot = Conversation(responses, reflections)
+
+def eliza_chat():
+    print("Therapist\n---------")
+    print("Talk to the program by typing in plain English, using normal upper-")
+    print('and lower-case letters and punctuation.  Enter "quit" when done.')
+    print('='*72)
+    print("Hello.  How are you feeling today?")
+
+    eliza_chatbot.converse()
+
+def demo():
+    eliza_chat()
+
+if __name__ == "__main__":
+    demo()
