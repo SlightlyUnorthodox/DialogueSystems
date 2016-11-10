@@ -19,6 +19,9 @@ import decimal
 from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 from .forms import CandidateForm, PreSurveyForm, PostSurveyForm
 
+global interview_id
+interview_id = 1
+
 def index(request):
 	template = loader.get_template('index.html')
 	context = RequestContext(request)
