@@ -1,8 +1,8 @@
 import nltk
 import datetime
-import threading, time 
+import threading
 
-from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
+#from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
 # Reflections were pulled from the NLTK source code for the chat package
 #http://www.nltk.org/_modules/nltk/chat/util.html#Chat
@@ -15,6 +15,11 @@ from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey
 # "you are a junior in high school, thank you for your response"
 # obviously we would like the convo to sound as natural as possible
 
+# TODO: Expand as more patterns are identified
+affirmative_patterns = "(?:[\s]|^)(yes|mhm|uhuh)(?=[\s]|$)"
+negative_patterns = "(?:[\s]|^)(no)(?=[\s]|$)"
+
+# From NLTK chatbot
 reflections = {
   "i am"       : "you are",
   "i was"      : "you were",
@@ -32,13 +37,14 @@ reflections = {
   "yours"      : "mine",
   "you"        : "me",
   "me"         : "you"
+
 }
 
-# Define dialogue pairs for each state
+# Define dialogue pairs (prompt-response) for each state
 
 # Greeting state pairs
 greeting_pairs =  (
-	
+	''	
 )
 
 # Resume-driven pairs
@@ -53,27 +59,56 @@ job_pairs = (
 
 # Eligibility pairs
 eligibility_pairs = (
-
+	( "Are you a United States citizen?",
+		{
+		 "yes": affirmative_patterns,
+		 "no": negative_patterns,
+		}),
+	( "Will you at any time require visa-sponsorship to continue working?",
+		{
+		 "yes": affirmative_patterns,
+		 "no": negative_patterns,
+		}),
+	( "Are you a protected veteran?",
+		{
+		 "yes": affirmative_patterns,
+		 "no": negative_patterns,
+		}),
+	( "Have you ever been convicted of a felony?",
+		{
+		 "yes": affirmative_patterns,
+		 "no": negative_patterns,
+		}),
+	( "Do you require any disability-related accomodations?",
+		{
+		 "yes": affirmative_patterns,
+		 "no": negative_patterns,
+		}),
 )
 
 # Closing state pairs
 closing_pairs = (
-
+	
 )
+
 class DialogueManager:
 	def __init__(self, candidate_id = 1, interview_id = 1):
+		
 		# Dialogue time variables
-		self.time_format = '%Y-%m-%d %H:%M:%S'
 		self.start_time = datetime.datetime.now()
-		self.start_time_formatted = time.mktime(datetime.datetime.strptime(self.start_time, self.time_format).timetuple())
 		self.current_time = datetime.datetime.now()
+		self.run_time = 0
 		self.max_time = 3 # Max 3 minutes
 		
 		# Dialogue information fields
+		# NOTE: using try/catch to handle testing outside of Django instance
 		self.candidate_id = candidate_id
-		self.candidate = Candidate.objects.get(candidate_id = int(candidate_id))
+		#self.candidate = Candidate.objects.get(candidate_id = int(candidate_id))
 		self.interview_id = interview_id
-		self.interview = Interview.objects.get(interview_id = int(interview_id))
+		#self.interview = Interview.objects.get(interview_id = int(interview_id))
+
+		# Dialogue interface
+		self.spoken = False
 
 		# Dialogue state information
 		self.system_state = 'Speaking'
@@ -82,33 +117,71 @@ class DialogueManager:
 		self.initiative = 'System'
 		self.current_speaker = 'System'
 
+		# Dialogue component space information
+		self.state_set = {
+			0: ['greeeting', 0], # 0 - incomplete, 1 - complete
+			1: ['resume', 0],
+			2: ['job', 0],
+			3: ['eligibility', 0],
+			4: ['conclusion', 0]
+		}
+
+		# Dialogue feature sets
+		self.resume_set = {
+			0: ['First Name', 0], # 0 - incomplete, 1 - complete
+			1: ['Last Name', 0],
+			2: ['Highest Education', 0],
+			3: ['Education Status', 0],
+			4: ['Major/Field', 0],
+			5: ['Years Experience', 0],
+			6: ['Relevant Employer', 0],
+			7: ['Relevant Job Title', 0]
+		}
+
+		self.skills_set = {
+			0: ["Java", 0], # 0 - na, 1-5 (strongly disagree to strongly agree)
+			1: ["C++", 0],
+			2: ["Databases", 0],
+			3: ["Git", 0],
+			4: ["", 0]
+		}
+
+		self.eligibility_set = {
+			0: ["citizen", 0], # 0 - na, 1 - no, 2 - yes
+			1: ["visa", 0], # 0 - na, 1 - not needed, 2 - needed
+			2: ["disability", 0], # 0 - na, 1 - no, 2 - yes
+			3: ["veteran", 0], # 0 - na, 1 - no, 2 - yes
+		}
+
 	def check_timeout(self):
 		# If difference in start and current time is greater than max
 		#	send signal to cancel process.
 
 		# Renew current time
 		self.current_time = datetime.datetime.now()
-		current_time_formatted = time.mktime(datetime.datetime.strptime(self.current_time, self.time_format).timetuple())
+		self.run_time = self.start_time - self.current_time
 
 		# Check dif
-		if((int(current_time_formatted - self.start_time_formatted) / 60) > self.max_time) {
+		if(divmod(self.run_time.total_seconds(), 60)[0] > self.max_time):
 			# System has surpassed max time
 			return(1)
-		}
 		
 		# System still has time
 		return(0)
 
-	def generate_speech(utterance):
+	def generate_speech(self, utterance):
 		# Call to speech synthesis api
 
-	def process_speech():
+		return(0)
+
+	def process_speech(self):
 		# Receive call from ASR api
 
-	def speak(self, utterance):
+		return(0)
 
-		# Print to console
-		print("System:" + utterance)
+	def speak(self):
+
+		# Check system state
 
 		try:
 			# Start to generate speech for utterance
@@ -122,9 +195,15 @@ class DialogueManager:
 		while 1:
 			pass
 
+
+		# Change system state
+		self.system_state = 'Listening'
+
+		return(0)
+
 	def listen(self):
 
-
+		return(0)
 
 	def run(self):
 
@@ -134,21 +213,30 @@ class DialogueManager:
 		print("When done, type or say, 'quit'.")
 
 		# Print/Speak opening line
-		self.speak(str("Hello " + self.candidate_id.first_name + ". My name is Preliminator. I will be conducting a brief screening interview today."))
-
+		# TODO: Uncommend
+		#self.generate_speech(str("Hello " + self.candidate_id.first_name + ". My name is Preliminator. I will be conducting a brief screening interview today."))
+		self.generate_speech(str("Hello Candidate. My name is Preliminator. I will be conducting a brief screening interview today."))
+		
+		# Start dialogue
 		while 1:
 
 			# If system state is 'Speaking', use system initiative
-			if(self.system_state == 'Speaking')
+			if(self.system_state == 'Speaking'):
 
-				# If state is 'closing' run final line, else continue interview
-				if (self.current_state == 'Closing'):
-					self.speak()
-				else:
-					self.speak()
+				self.speak()
+
+			# If system state is 'Interrupted', use user initiative
+			elif (self.system_state == 'Interrupted'):
+				
+				# Response to interrupted with query
+				self.generate_speech("Yes?")
+
+				# Set state to 'Listenening'
+				self.system_state = 'Listening'
 
 			# If system state is 'Listening', use user initiative
 			else:
+
 				input_utterance = self.listen()
 				
 				# If 'quit' entered, exit dialogue
@@ -158,12 +246,15 @@ class DialogueManager:
 			# Check for end conditions
 
 			# Timeout
-			if(self.check_timeout() == 1) {
-				break
-			}
+			if(self.check_timeout() == 1):
+				self.system_state = 'Conclusion'
+			
 
 			# State based (needs refinement)
-			# if(self.current_state == "Closing") {
+			# if(self.current_state == "Closing"):
 			# 	break
-			# }
+			# 
 
+
+dlg = DialogueManager()
+dlg.run()
