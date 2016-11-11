@@ -59,11 +59,11 @@ class PreSurveyForm(forms.Form):
 		(5, 'Strongly Agree')
 	)
 
-	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question One Response', required = True, initial =  3)
-	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Two Response', required = True, initial =  3)
-	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Three Response', required = True, initial =  3)
-	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Four Response', required = True, initial =  3)
-	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Five Response', required = True, initial =  3)
+	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 1: I am interested in using dialogue systems to help me with tasks.', required = True, initial =  3)
+	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 2: I believe this system will help prepare me for interviews.', required = True, initial =  3)
+	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 3: I am confident this system will understand me majority of the time.', required = True, initial =  3)
+	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 4: I believe this system will be easy to use.', required = True, initial =  3)
+	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 5: I have previous experience using dialogue systems.', required = True, initial =  3)
 
 #PostSurvey
 class PostSurveyForm(forms.Form):
@@ -77,11 +77,11 @@ class PostSurveyForm(forms.Form):
 		(5, 'Strongly Agree')
 	)
 
-	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question One Response', required = True, initial =  3)
-	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Two Response', required = True, initial =  3)
-	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Three Response',required = True, initial =  3)
-	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Four Response', required = True, initial =  3)
-	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question Five Response', required = True, initial =  3)
+	questionOneResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 1: This system has sustained or fostered my interest in using dialogue systems to help me with tasks.', required = True, initial =  3)
+	questionTwoResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 2: I believe this system has helped prepare me for interviews.', required = True, initial =  3)
+	questionThreeResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 3: I am confident this system understood me majority of the time.',required = True, initial =  3)
+	questionFourResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 4: This system was easy to use.', required = True, initial =  3)
+	questionFiveResponse = forms.ChoiceField(choices = RESPONSES, label = 'Question 5: I believe my previous experience helped me use this dialogue system.', required = True, initial =  3)
 
 #Transcript
 class TranscriptForm(forms.Form):

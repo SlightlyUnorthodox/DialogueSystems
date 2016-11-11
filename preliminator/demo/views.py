@@ -201,7 +201,7 @@ def pre_survey(request):
 			#return render(request, 'interview_page.html', {'form':form, 'state':state, 'interview': request.session.get('interview', None)})
 	else:
 		# Initialize candidate form
-		form = PostSurveyForm()
+		form = PreSurveyForm()
 
 	# Cycle initialized form
 	state = "Please enter pre-screening survey information"
