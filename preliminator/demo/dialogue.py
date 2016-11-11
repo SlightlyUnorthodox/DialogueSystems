@@ -4,57 +4,44 @@ import threading
 
 #from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
-# Reflections were pulled from the NLTK source code for the chat package
-#http://www.nltk.org/_modules/nltk/chat/util.html#Chat
-
-# Reflections take in user utterances and chooses what
-# words to swap out during the answer
-# i.e. If te candidate says "I am a junior in high school"
-# then the system would swap out "i am" for "you are" in the
-# response so the resonse would be something like
-# "you are a junior in high school, thank you for your response"
-# obviously we would like the convo to sound as natural as possible
-
 # TODO: Expand as more patterns are identified
 affirmative_patterns = "(?:[\s]|^)(yes|mhm|uhuh)(?=[\s]|$)"
 negative_patterns = "(?:[\s]|^)(no)(?=[\s]|$)"
-
-# From NLTK chatbot
-reflections = {
-  "i am"       : "you are",
-  "i was"      : "you were",
-  "i"          : "you",
-  "i'm"        : "you are",
-  "i'd"        : "you would",
-  "i've"       : "you have",
-  "i'll"       : "you will",
-  "my"         : "your",
-  "you are"    : "I am",
-  "you were"   : "I was",
-  "you've"     : "I have",
-  "you'll"     : "I will",
-  "your"       : "my",
-  "yours"      : "mine",
-  "you"        : "me",
-  "me"         : "you"
-
-}
+likert_patterns_one =  "(?:[\s]|^)(one)(?=[\s]|$)"
+likert_patterns_two =  "(?:[\s]|^)(two)(?=[\s]|$)"
+likert_patterns_three =  "(?:[\s]|^)(three)(?=[\s]|$)"
+likert_patterns_four =  "(?:[\s]|^)(four)(?=[\s]|$)"
+likert_patterns_five =  "(?:[\s]|^)(five)(?=[\s]|$)"
+gpa_patterns = "(?:[\s]|^)(point)(?=[\s]|$)"
 
 # Define dialogue pairs (prompt-response) for each state
 
 # Greeting state pairs
 greeting_pairs =  (
-	''	
+	( "Hello, my name is Preliminator, what is your name?", 
+	{
+		"name": "any input",
+	}),	
 )
 
 # Resume-driven pairs
 resume_pairs = (
-
+	( "I didn't see you enter your GPA, to the best of your knowledge, what is your current GPA?",
+		{
+			"gpa": gpa_patterns,
+		}),
 )
 
 # Job-driven pairs
 job_pairs = (
-
+	( "On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Git?",
+		{
+		 1: likert_patterns_one,
+		 2: likert_patterns_two,
+		 3: likert_patterns_three,
+		 4: likert_patterns_four,
+		 5: likert_patterns_five,
+		}),
 )
 
 # Eligibility pairs
@@ -88,7 +75,11 @@ eligibility_pairs = (
 
 # Closing state pairs
 closing_pairs = (
-	
+	( "I would like to thank you for taking the time to try the Preliminator demo. Do you have any questions?",
+		{
+		"yes": affirmative_patterns,
+		"no": negative_patterns,
+		}),
 )
 
 class DialogueManager:
@@ -118,40 +109,40 @@ class DialogueManager:
 		self.current_speaker = 'System'
 
 		# Dialogue component space information
-		self.state_set = {
-			0: ['greeeting', 0], # 0 - incomplete, 1 - complete
-			1: ['resume', 0],
-			2: ['job', 0],
-			3: ['eligibility', 0],
-			4: ['conclusion', 0]
-		}
+		self.state_set = collections.OrderedDict({
+			'greeeting': 0, # 0 - incomplete, 1 - complete
+			'resume': 0,
+			'job': 0,
+			'eligibility': 0,
+			'conclusion': 0,
+		})
 
 		# Dialogue feature sets
-		self.resume_set = {
-			0: ['First Name', 0], # 0 - incomplete, 1 - complete
-			1: ['Last Name', 0],
-			2: ['Highest Education', 0],
-			3: ['Education Status', 0],
-			4: ['Major/Field', 0],
-			5: ['Years Experience', 0],
-			6: ['Relevant Employer', 0],
-			7: ['Relevant Job Title', 0]
-		}
+		self.resume_set = collections.OrderedDict({
+			'First Name': 0, # 0 - incomplete, 1 - complete
+			'Last Name': 0,
+			'Highest Education': 0,
+			'Education Status': 0,
+			'Major/Field': 0,
+			'Years Experience': 0,
+			'Relevant Employer': 0,
+			'Relevant Job Title': 0
+		})
 
-		self.skills_set = {
-			0: ["Java", 0], # 0 - na, 1-5 (strongly disagree to strongly agree)
-			1: ["C++", 0],
-			2: ["Databases", 0],
-			3: ["Git", 0],
-			4: ["", 0]
-		}
+		self.skills_set = collections.OrderedDict({
+			'Java': 0, # 0 - na, 1-5 (strongly disagree to strongly agree)
+			'C++': 0,
+			'Databases': 0,
+			'Git': 0,
+			'Networking': 0,
+		})
 
-		self.eligibility_set = {
-			0: ["citizen", 0], # 0 - na, 1 - no, 2 - yes
+		self.eligibility_set = collections.OrderedDict({
+			'citizen': 0, # 0 - na, 1 - no, 2 - yes
 			1: ["visa", 0], # 0 - na, 1 - not needed, 2 - needed
 			2: ["disability", 0], # 0 - na, 1 - no, 2 - yes
 			3: ["veteran", 0], # 0 - na, 1 - no, 2 - yes
-		}
+		})
 
 	def check_timeout(self):
 		# If difference in start and current time is greater than max
@@ -172,6 +163,8 @@ class DialogueManager:
 	def generate_speech(self, utterance):
 		# Call to speech synthesis api
 
+		print(utterance)
+		
 		return(0)
 
 	def process_speech(self):
@@ -191,7 +184,7 @@ class DialogueManager:
 			thread.start_new_thread()
 		except:
 			# Generate speech set for interruption
-			generate_speech(state = "Interrupted")
+			self.generate_speech(state = "Interrupted")
 		while 1:
 			pass
 
@@ -216,7 +209,7 @@ class DialogueManager:
 		# TODO: Uncommend
 		#self.generate_speech(str("Hello " + self.candidate_id.first_name + ". My name is Preliminator. I will be conducting a brief screening interview today."))
 		self.generate_speech(str("Hello Candidate. My name is Preliminator. I will be conducting a brief screening interview today."))
-		
+		self.state_set[0][1] = 1
 		# Start dialogue
 		while 1:
 
