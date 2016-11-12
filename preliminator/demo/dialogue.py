@@ -2,14 +2,19 @@ import nltk
 import datetime
 import threading
 import views
+import collections
+
+
 #from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
 # need a way to access this variable in views.py
 # maybe move this into the class, not 100% sure
 # this is the class creating the utterance and we need to
 # pass it to the request in views
-global current_user_utterance = ""
-global current_bot_utterance = ""
+global current_user_utterance 
+current_user_utterance = ""
+global current_bot_utterance 
+current_bot_utterance = ""
 
 # TODO: Expand as more patterns are identified
 affirmative_patterns = "(?:[\s]|^)(yes|mhm|uhuh)(?=[\s]|$)"
@@ -146,9 +151,9 @@ class DialogueManager:
 
 		self.eligibility_set = collections.OrderedDict({
 			'citizen': 0, # 0 - na, 1 - no, 2 - yes
-			1: ["visa", 0], # 0 - na, 1 - not needed, 2 - needed
-			2: ["disability", 0], # 0 - na, 1 - no, 2 - yes
-			3: ["veteran", 0], # 0 - na, 1 - no, 2 - yes
+			'visa': 0, # 0 - na, 1 - not needed, 2 - needed
+			'disability': 0, # 0 - na, 1 - no, 2 - yes
+			'veteran': 0, # 0 - na, 1 - no, 2 - yes
 		})
 
 	def check_timeout(self):
@@ -192,7 +197,8 @@ class DialogueManager:
 			thread.start_new_thread()
 		except:
 			# Generate speech set for interruption
-			self.generate_speech(state = "Interrupted")
+			self.generate_speech(utterance = "Yes?")
+			
 		while 1:
 			pass
 
@@ -217,7 +223,8 @@ class DialogueManager:
 		# TODO: Uncommend
 		#self.generate_speech(str("Hello " + self.candidate_id.first_name + ". My name is Preliminator. I will be conducting a brief screening interview today."))
 		self.generate_speech(str("Hello Candidate. My name is Preliminator. I will be conducting a brief screening interview today."))
-		self.state_set[0][1] = 1
+		self.state_set['greeting'] = 1
+
 		# Start dialogue
 		while 1:
 
