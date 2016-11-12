@@ -1,8 +1,15 @@
 import nltk
 import datetime
 import threading
-
+import views
 #from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
+
+# need a way to access this variable in views.py
+# maybe move this into the class, not 100% sure
+# this is the class creating the utterance and we need to
+# pass it to the request in views
+global current_user_utterance = ""
+global current_bot_utterance = ""
 
 # TODO: Expand as more patterns are identified
 affirmative_patterns = "(?:[\s]|^)(yes|mhm|uhuh)(?=[\s]|$)"
@@ -18,10 +25,10 @@ gpa_patterns = "(?:[\s]|^)(point)(?=[\s]|$)"
 
 # Greeting state pairs
 greeting_pairs =  (
-	( "Hello, my name is Preliminator, what is your name?", 
+	( "Hello, my name is Preliminator, what is your name?",
 	{
 		"name": "any input",
-	}),	
+	}),
 )
 
 # Resume-driven pairs
@@ -84,13 +91,13 @@ closing_pairs = (
 
 class DialogueManager:
 	def __init__(self, candidate_id = 1, interview_id = 1):
-		
+
 		# Dialogue time variables
 		self.start_time = datetime.datetime.now()
 		self.current_time = datetime.datetime.now()
 		self.run_time = 0
 		self.max_time = 3 # Max 3 minutes
-		
+
 		# Dialogue information fields
 		# NOTE: using try/catch to handle testing outside of Django instance
 		self.candidate_id = candidate_id
@@ -156,20 +163,21 @@ class DialogueManager:
 		if(divmod(self.run_time.total_seconds(), 60)[0] > self.max_time):
 			# System has surpassed max time
 			return(1)
-		
+
 		# System still has time
 		return(0)
 
 	def generate_speech(self, utterance):
 		# Call to speech synthesis api
+		# we don't want to make the http rsponse live here though
+		#print(utterance)
 
-		print(utterance)
-		
-		return(0)
+		return utterance
 
+	# i interpreted this method as the place where
+	# we actually get the input data fromt he webchat box
 	def process_speech(self):
-		# Receive call from ASR api
-
+		current_user_utterance = views.receive_chat_text
 		return(0)
 
 	def speak(self):
@@ -220,7 +228,7 @@ class DialogueManager:
 
 			# If system state is 'Interrupted', use user initiative
 			elif (self.system_state == 'Interrupted'):
-				
+
 				# Response to interrupted with query
 				self.generate_speech("Yes?")
 
@@ -231,7 +239,7 @@ class DialogueManager:
 			else:
 
 				input_utterance = self.listen()
-				
+
 				# If 'quit' entered, exit dialogue
 				if(input_utterance.lower() == "quit"):
 					return(0)
@@ -241,12 +249,12 @@ class DialogueManager:
 			# Timeout
 			if(self.check_timeout() == 1):
 				self.system_state = 'Conclusion'
-			
+
 
 			# State based (needs refinement)
 			# if(self.current_state == "Closing"):
 			# 	break
-			# 
+			#
 
 
 dlg = DialogueManager()
