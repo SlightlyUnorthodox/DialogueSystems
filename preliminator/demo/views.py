@@ -290,11 +290,13 @@ def post_survey(request):
 # incorporated here
 def add_chat_text(request):
 	# buttons are post
-	if request.method = 'POST'
+	if request.method == 'POST':
 		text_to_add = dm.current_utterance
 	else:
-
-	return HttpResponse(text_to_add)
+		# Do something else? -Dax
+		print("do nothing")
+		
+	return(HttpResponse(text_to_add))
 
 # 7 to pull text entered by user
 # when you clicks button its a post method and we

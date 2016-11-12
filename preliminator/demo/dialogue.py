@@ -114,49 +114,52 @@ class DialogueManager:
 		self.spoken = False
 
 		# Dialogue state information
-		self.system_state = 'Speaking'
-		self.current_state = 'Greeting'
-		self.end_state = 'Closing'
-		self.initiative = 'System'
-		self.current_speaker = 'System'
+		self.system_state = 'speaking'
+		self.current_state = 'greeting'
+		self.current_state_utterance = 0
+		self.end_state = 'closing'
+		self.initiative = 'system'
+		self.current_speaker = 'system'
 
 		# Dialogue component space information
-		self.state_set = collections.OrderedDict({
-			'greeeting': 0, # 0 - incomplete, 1 - complete
-			'resume': 0,
-			'job': 0,
-			'eligibility': 0,
-			'conclusion': 0,
-		})
+		self.state_set = collections.OrderedDict([
+			('greeting', [0, greeting_pairs]), # 0 - incomplete, 1 - complete
+			('resume', [0, resume_pairs]),
+			('job', [0, job_pairs]),
+			('eligibility', [0, eligibility_pairs]),
+			('closing', [0, closing_pairs]),
+		])
 
 		# Dialogue feature sets
-		self.resume_set = collections.OrderedDict({
-			'First Name': 0, # 0 - incomplete, 1 - complete
-			'Last Name': 0,
-			'Highest Education': 0,
-			'Education Status': 0,
-			'Major/Field': 0,
-			'Years Experience': 0,
-			'Relevant Employer': 0,
-			'Relevant Job Title': 0
-		})
+		self.resume_set = collections.OrderedDict([
+			('First Name', 0), # 0 - incomplete, 1 - complete
+			('Last Name', 0),
+			('Highest Education', 0),
+			('Education Status', 0),
+			('Major/Field', 0),
+			('Years Experience', 0),
+			('Relevant Employer', 0),
+			('Relevant Job Title', 0)
+		])
 
-		self.skills_set = collections.OrderedDict({
-			'Java': 0, # 0 - na, 1-5 (strongly disagree to strongly agree)
-			'C++': 0,
-			'Databases': 0,
-			'Git': 0,
-			'Networking': 0,
-		})
+		self.skills_set = collections.OrderedDict([
+			('Java', 0), # 0 - na, 1-5 (strongly disagree to strongly agree)
+			('C++', 0),
+			('Databases', 0),
+			('Git', 0),
+			('Networking', 0),
+		])
 
-		self.eligibility_set = collections.OrderedDict({
-			'citizen': 0, # 0 - na, 1 - no, 2 - yes
-			'visa': 0, # 0 - na, 1 - not needed, 2 - needed
-			'disability': 0, # 0 - na, 1 - no, 2 - yes
-			'veteran': 0, # 0 - na, 1 - no, 2 - yes
-		})
+		self.eligibility_set = collections.OrderedDict([
+			('citizen', 0), # 0 - na, 1 - no, 2 - yes
+			('visa', 0), # 0 - na, 1 - not needed, 2 - needed
+			('disability', 0), # 0 - na, 1 - no, 2 - yes
+			('veteran', 0), # 0 - na, 1 - no, 2 - yes
+		])
 
-	def check_timeout(self):
+	## Dialogue Manager Utilities
+
+	def __check_timeout(self):
 		# If difference in start and current time is greater than max
 		#	send signal to cancel process.
 
@@ -172,78 +175,123 @@ class DialogueManager:
 		# System still has time
 		return(0)
 
+	def __check_state(self):
+
+		# Check to see if current state has remaining utterances ## TODO: make more sophisticated
+		if ((self.current_state_utterance + 1) == len(self.state_set[self.current_state][1])):
+			# If no more utterances, mark state complete
+			self.state_set[self.current_state] = 1
+			self.current_state_utterance = 0		
+		else:
+			# Otherwise, increment current utterance
+			self.current_state_utterance += 1
+
+		# Assign current state as first zero-completion state
+		for key in self.state_set:
+			print("Key: " + key)
+			if self.state_set[key] == 0:
+				self.current_state = key
+				return(0)
+
+		# If all states complete, default to closing
+		self.current_state = 'closing'
+
+		return(0)
+
+	## Automatic Speech Recognition (ASR) Methods
+	
+	# Recieves text from API
+	def listen(self):
+		
+		# TODO: Implement back into views
+		#current_user_utterance = views.receive_chat_text
+
+		# Use text listener for now
+		user_input = raw_input()
+		return(user_input)
+
+	# Processes text into dialogue manager
+	def process_speech(self):
+		
+		return(0)
+
+	## Speech Synthesis Methods
+	
+	# Sends selected text to speech synthesis API
 	def generate_speech(self, utterance):
 		# Call to speech synthesis api
 		# we don't want to make the http rsponse live here though
-		#print(utterance)
+		print(utterance)
 
 		return utterance
 
-	# i interpreted this method as the place where
-	# we actually get the input data fromt he webchat box
-	def process_speech(self):
-		current_user_utterance = views.receive_chat_text
-		return(0)
-
+	# Selects utterance to use
 	def speak(self):
 
 		# Check system state
 
-		try:
-			# Start to generate speech for utterance
-			thread.start_new_thread()
+		# TODO: Implement multi-threading for interruption listener
+		# try:
+		# 	# # Start to generate speech for utterance
+		# 	# thread.start_new_thread()
 
-			# Keep thread open for interruption or timeout
-			thread.start_new_thread()
-		except:
-			# Generate speech set for interruption
-			self.generate_speech(utterance = "Yes?")
-			
-		while 1:
-			pass
+		# 	# # Keep thread open for interruption or timeout
+		# 	# thread.start_new_thread()
+		# except:
+		# 	# Generate speech set for interruption
+		# 	self.generate_speech(utterance = "Yes?")
 
+		# while 1:
+		# 	pass
 
+		current_utterance = self.state_set[self.current_state][1][0][self.current_state_utterance]
+
+		self.generate_speech(utterance = current_utterance)
 		# Change system state
-		self.system_state = 'Listening'
+		self.system_state = 'listening'
 
 		return(0)
-
-	def listen(self):
-
-		return(0)
+	
+	## Run Dialogue Manager
 
 	def run(self):
 
 		# Log demo run text
 		print("Preliminator\n------------")
 		print("Carry out pre-screening interview by typing or speaking in plain English.\n")
-		print("When done, type or say, 'quit'.")
+		print("When done, type or say, 'quit'.\n\n")
 
 		# Print/Speak opening line
 		# TODO: Uncommend
 		#self.generate_speech(str("Hello " + self.candidate_id.first_name + ". My name is Preliminator. I will be conducting a brief screening interview today."))
-		self.generate_speech(str("Hello Candidate. My name is Preliminator. I will be conducting a brief screening interview today."))
-		self.state_set['greeting'] = 1
+		#self.generate_speech(str("Hello Candidate. My name is Preliminator. I will be conducting a brief screening interview today."))
+		#self.state_set['greeting'][0] = 1
 
 		# Start dialogue
 		while 1:
 
+			self.__check_state()
+			print("System state = " + self.current_state + "\n")
+
 			# If system state is 'Speaking', use system initiative
-			if(self.system_state == 'Speaking'):
+			if(self.system_state == 'speaking'):
+				print("System Speaking\n")
 
 				self.speak()
 
 			# If system state is 'Interrupted', use user initiative
-			elif (self.system_state == 'Interrupted'):
+			elif (self.system_state == 'interrupted'):
+				print("System Interrupted\n")
 
 				# Response to interrupted with query
 				self.generate_speech("Yes?")
 
 				# Set state to 'Listenening'
-				self.system_state = 'Listening'
+				self.system_state = 'listening'
 
 			# If system state is 'Listening', use user initiative
 			else:
+				print("User Speaking\n")
 
 				input_utterance = self.listen()
 
@@ -254,8 +302,9 @@ class DialogueManager:
 			# Check for end conditions
 
 			# Timeout
-			if(self.check_timeout() == 1):
-				self.system_state = 'Conclusion'
+			if(self.__check_timeout() == 1):
+				print("System Concluding\n")
+				self.system_state = 'conclusion'
 
 
 			# State based (needs refinement)
