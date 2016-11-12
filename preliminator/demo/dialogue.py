@@ -7,15 +7,6 @@ import collections
 
 #from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
-# need a way to access this variable in views.py
-# maybe move this into the class, not 100% sure
-# this is the class creating the utterance and we need to
-# pass it to the request in views
-global current_user_utterance 
-current_user_utterance = ""
-global current_bot_utterance 
-current_bot_utterance = ""
-
 # TODO: Expand as more patterns are identified
 affirmative_patterns = "(?:[\s]|^)(yes|mhm|uhuh)(?=[\s]|$)"
 negative_patterns = "(?:[\s]|^)(no)(?=[\s]|$)"
@@ -87,11 +78,11 @@ eligibility_pairs = (
 
 # Closing state pairs
 closing_pairs = (
-	( "I would like to thank you for taking the time to try the Preliminator demo. Do you have any questions?",
+	( "Well I believe we are out of time. Thank you for taking the time to try the Preliminator demo and have a good day.",
 		{
-		"yes": affirmative_patterns,
-		"no": negative_patterns,
+		"any":"any pattern",
 		}),
+
 )
 
 class DialogueManager:
@@ -157,6 +148,10 @@ class DialogueManager:
 			('veteran', 0), # 0 - na, 1 - no, 2 - yes
 		])
 
+		# Store recent utterances
+		self.current_system_utterance = ""
+		self.current_user_utterance = ""
+
 	## Dialogue Manager Utilities
 
 	def __check_timeout(self):
@@ -178,9 +173,9 @@ class DialogueManager:
 	def __check_state(self):
 
 		# Check to see if current state has remaining utterances ## TODO: make more sophisticated
-		if ((self.current_state_utterance + 1) == len(self.state_set[self.current_state][1])):
+		if ((self.current_state_utterance + 1) > len(self.state_set[self.current_state][1])):
 			# If no more utterances, mark state complete
-			self.state_set[self.current_state] = 1
+			self.state_set[self.current_state][0] = 1
 			self.current_state_utterance = 0		
 		else:
 			# Otherwise, increment current utterance
@@ -188,8 +183,10 @@ class DialogueManager:
 
 		# Assign current state as first zero-completion state
 		for key in self.state_set:
-			print("Key: " + key)
-			if self.state_set[key] == 0:
+			#print("Key: " + key)
+			#print(self.state_set[key][0])
+
+			if (self.state_set[key][0] == 0):
 				self.current_state = key
 				return(0)
 
@@ -208,11 +205,18 @@ class DialogueManager:
 
 		# Use text listener for now
 		user_input = raw_input()
-		return(user_input)
+
+		# Pass input to dialogue manager for parsing
+		self.process_speech(user_input)
 
 	# Processes text into dialogue manager
-	def process_speech(self):
+	def process_speech(self, input):
 		
+		# Do something with input
+
+		# Change system state
+		self.system_state = 'speaking'
+
 		return(0)
 
 	## Speech Synthesis Methods
@@ -221,9 +225,9 @@ class DialogueManager:
 	def generate_speech(self, utterance):
 		# Call to speech synthesis api
 		# we don't want to make the http rsponse live here though
-		print(utterance)
+		print("System: " + str(utterance) + "\n")
 
-		return utterance
+		return(0)
 
 	# Selects utterance to use
 	def speak(self):
@@ -244,9 +248,10 @@ class DialogueManager:
 		# while 1:
 		# 	pass
 
-		current_utterance = self.state_set[self.current_state][1][0][self.current_state_utterance]
+		current_utterance = self.state_set[self.current_state][1][self.current_state_utterance][0]
 
 		self.generate_speech(utterance = current_utterance)
+		
 		# Change system state
 		self.system_state = 'listening'
 
@@ -270,19 +275,17 @@ class DialogueManager:
 		# Start dialogue
 		while 1:
 
-			self.__check_state()
-			print("System state = " + self.current_state + "\n")
+			print("System state = " + self.system_state)
+			print("Current state = " + self.current_state + "\n")
 
 			# If system state is 'Speaking', use system initiative
 			if(self.system_state == 'speaking'):
-				print("System Speaking\n")
-
+				
 				self.speak()
 
 			# If system state is 'Interrupted', use user initiative
 			elif (self.system_state == 'interrupted'):
-				print("System Interrupted\n")
-
+				
 				# Response to interrupted with query
 				self.generate_speech("Yes?")
 
@@ -291,12 +294,11 @@ class DialogueManager:
 
 			# If system state is 'Listening', use user initiative
 			else:
-				print("User Speaking\n")
-
-				input_utterance = self.listen()
+			
+				self.listen()
 
 				# If 'quit' entered, exit dialogue
-				if(input_utterance.lower() == "quit"):
+				if(self.current_user_utterance == "quit"):
 					return(0)
 
 			# Check for end conditions
@@ -304,14 +306,17 @@ class DialogueManager:
 			# Timeout
 			if(self.__check_timeout() == 1):
 				print("System Concluding\n")
-				self.system_state = 'conclusion'
+				self.system_state = 'closing'
 
 
 			# State based (needs refinement)
-			# if(self.current_state == "Closing"):
-			# 	break
-			#
+			if(self.current_state == 'closing'):
+			 	return(0)
+			
 
 
-dlg = DialogueManager()
-dlg.run()
+			self.__check_state()
+
+
+# dlg = DialogueManager()
+# dlg.run()
