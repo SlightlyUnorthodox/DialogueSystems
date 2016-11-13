@@ -10,7 +10,9 @@ urlpatterns = [
 	url(r'^interview_page', views.interview_page, name = 'interview_page'),
 	url(r'^feedback_page', views.feedback_page, name = 'feedback_page'),
 	url(r'^post_survey', views.post_survey, name = 'post_survey'),
-	url(r'^', views.index, name = 'index')
+	url(r'^process_ajax', views.process_ajax, name='process_ajax'),
+	url(r'^', views.index, name = 'index'),
+
 ]
 
 # urlpatterns = [

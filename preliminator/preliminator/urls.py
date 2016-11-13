@@ -16,6 +16,11 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 
+"""For responding to AJAX requests:
+from django.core.context_processors import csrf
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import simplejson """
+
 urlpatterns = [
 	url(r'^demo/', include('demo.urls')),
     url(r'^admin/', admin.site.urls),
