@@ -55,7 +55,7 @@ ROOT_URLCONF = 'preliminator.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.realpath('.') + "/template"],
+        'DIRS': [os.path.realpath('.') + "preliminator/template"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
