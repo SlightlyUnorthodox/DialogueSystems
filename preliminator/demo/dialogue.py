@@ -1,11 +1,10 @@
 import nltk
 import datetime
 import threading
-import views
+#import views
 import collections
 
-
-#from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
+from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
 # TODO: Expand as more patterns are identified
 affirmative_patterns = "(?:[\s]|^)(yes|mhm|uhuh)(?=[\s]|$)"
@@ -97,9 +96,9 @@ class DialogueManager:
 		# Dialogue information fields
 		# NOTE: using try/catch to handle testing outside of Django instance
 		self.candidate_id = candidate_id
-		#self.candidate = Candidate.objects.get(candidate_id = int(candidate_id))
 		self.interview_id = interview_id
-		#self.interview = Interview.objects.get(interview_id = int(interview_id))
+		self.candidate = Candidate.objects.get(candidate_id = int(candidate_id))
+		self.interview = Interview.objects.get(interview_id = int(interview_id))
 
 		# Dialogue interface
 		self.spoken = False
@@ -170,10 +169,10 @@ class DialogueManager:
 		# System still has time
 		return(0)
 
-	def __check_state(self):
+	def check_state(self):
 
 		# Check to see if current state has remaining utterances ## TODO: make more sophisticated
-		if ((self.current_state_utterance + 1) > len(self.state_set[self.current_state][1])):
+		if ((self.current_state_utterance + 1) >= len(self.state_set[self.current_state][1])):
 			# If no more utterances, mark state complete
 			self.state_set[self.current_state][0] = 1
 			self.current_state_utterance = 0		
@@ -188,12 +187,14 @@ class DialogueManager:
 
 			if (self.state_set[key][0] == 0):
 				self.current_state = key
-				return(0)
+				print("Current key: " + str(self.current_state) + "\tCurrent utterance index: " + str(self.current_state_utterance) + "\n")
+				return
 
 		# If all states complete, default to closing
 		self.current_state = 'closing'
 
-		return(0)
+		print("Current key: " + str(self.current_state) + "\tCurrent utterance index: " + str(self.current_state_utterance) + "\n")
+		return
 
 	## Automatic Speech Recognition (ASR) Methods
 	
@@ -227,7 +228,7 @@ class DialogueManager:
 		# we don't want to make the http rsponse live here though
 		print("System: " + str(utterance) + "\n")
 
-		return(0)
+		return(utterance)
 
 	# Selects utterance to use
 	def speak(self):
@@ -248,14 +249,14 @@ class DialogueManager:
 		# while 1:
 		# 	pass
 
-		current_utterance = self.state_set[self.current_state][1][self.current_state_utterance][0]
+		self.current_system_utterance = self.state_set[self.current_state][1][self.current_state_utterance][0]
 
-		self.generate_speech(utterance = current_utterance)
+		system_utterance = self.generate_speech(utterance = self.current_system_utterance)
 		
 		# Change system state
 		self.system_state = 'listening'
 
-		return(0)
+		return(system_utterance)
 	
 	## Run Dialogue Manager
 

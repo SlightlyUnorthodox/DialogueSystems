@@ -17,14 +17,21 @@ from django.utils import dateformat
 import datetime
 import decimal
 import dialogue as dm
+import random
+import time
+import dialogue
+import threading 
 
 #import necessary models and forms
 from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 from .forms import CandidateForm, PreSurveyForm, PostSurveyForm
 
+# Prevent testing errors by setting defaults
 global interview_id
 global candidate_id
 interview_id = 1
+candidate_id = 1
+
 
 def index(request):
 	template = loader.get_template('index.html')
@@ -214,17 +221,12 @@ def pre_survey(request):
 # 3. Interview Page - hosts dialogue for interview
 def interview_page(request):
 
-	# Confirm candidate and interview info forwarding
-	#candidate = Candidate.objects.get(candidate_id = int(candidate_id))
-	#interview = Interview.objects.get(interview_id = int(interview_id))
+	# Initialize dialogue manager
+	global dm
+	dm = dialogue.DialogueManager(candidate_id = candidate_id, interview_id = interview_id)
+	#dm = dialogue.DialogueManager()
 
-	#print(candidate.first_name)
-	#print(candidate.last_name)
-	#print(candidate.highest_education)
-
-	#print(interview.start_time)
-	#print(interview.end_time)
-
+	# Hacky solution to start things
 	return render(request, 'interview_page.html', {'interview':request.session.get('interview', None)})
 
 # 4. Feedback Page - provides dialogue feedback for candidate and recruiter
@@ -311,21 +313,30 @@ def receive_chat_text(request):
 """
 Temporary response. Will call the dialog system instead.
 """
-@csrf_exempt
+
 def process_ajax(request):
-	copyPastas = []
-	copyPastas.append("What the fuck did you just fucking say about me, you little bitch? I’ll have you know I graduated top of my class in the Navy Seals, and I’ve been involved in numerous secret raids on Al-Quaeda, and I have over 300 confirmed kills.")
-	copyPastas.append("I am trained in gorilla warfare and I’m the top sniper in the entire US armed forces.")
-	copyPastas.append("You are nothing to me but just another target. I will wipe you the fuck out with precision the likes of which has never been seen before on this Earth, mark my fucking words.")
-	copyPastas.append("You think you can get away with saying that shit to me over the Internet? Think again, fucker.")
-	copyPastas.append("As we speak I am contacting my secret network of spies across the USA and your IP is being traced right now so you better prepare for the storm, maggot. The storm that wipes out the pathetic little thing you call your life.")
-	copyPastas.append("You’re fucking dead, kid. I can be anywhere, anytime, and I can kill you in over seven hundred ways, and that’s just with my bare hands.")
-	copyPastas.append("Not only am I extensively trained in unarmed combat, but I have access to the entire arsenal of the United States Marine Corps and I will use it to its full extent to wipe your miserable ass off the face of the continent, you little shit.")
-	copyPastas.append("If only you could have known what unholy retribution your little \"clever\" comment was about to bring down upon you, maybe you would have held your fucking tongue. But you couldn’t, you didn’t, and now you’re paying the price, you goddamn idiot.")
-	copyPastas.append("I will shit fury all over you and you will drown in it. You’re fucking dead, kiddo.")
 
-	import time
-	time.sleep(5) # delays for a few seconds to simulate processing.
+	# Process user utterance
+	user_utterance = dm.process_speech(input = "test utterance")
 
-	import random
-	return HttpResponse(random.choice(copyPastas))
+	print(request)
+	print(request.GET.get('user_input_box',''))
+
+	time.sleep(1) # delays for a few seconds to simulate processing.
+	
+	
+
+	# If state is 'closing' stop sending system utterance
+	if (dm.current_state == dm.end_state):
+		# Use utterance to indicate button to click
+		system_utterance = "The Preliminator Demo is now over. Please click on the 'See Feedback' button below."
+		
+	else:
+		# Set system utterance
+		system_utterance = dm.speak()
+		
+		# Iterate system state
+		dm.check_state()
+
+	# Render utterance to screen	
+	return HttpResponse(system_utterance)
