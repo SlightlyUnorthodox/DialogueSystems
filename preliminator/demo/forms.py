@@ -1,7 +1,7 @@
 #Dax Gerts, Sara Lichtenstein, Forms
 from django import forms
 from django.forms import ModelForm, modelformset_factory
-from .models import User, Candidate, Recruiter
+from .models import User, Candidate, Recruiter, Interview, Transcript	
 
 #SignIn, general, should we have a register form?
 class SignInForm(forms.Form):
@@ -88,3 +88,14 @@ class TranscriptForm(forms.Form):
 	speakerChoice = forms.CharField(label = 'Speaker', max_length = 1, required = True)
 	lineNumber = forms.IntegerField(label = 'Line Number', min_value = 1, max_value = 2000)
 	lineContents = forms.CharField(label = 'Line Content', min_length = 1, max_length = 2000)
+
+#Interview Post Form
+class PostForm(forms.ModelForm):
+	class Meta:
+		model = Transcript	
+		fields = ['line_contents']
+		widgets = {
+			'line_contents': forms.TextInput(
+				attrs={'id': 'inputText', 'required': True, 'placeholder': 'nah'}
+				),
+		}

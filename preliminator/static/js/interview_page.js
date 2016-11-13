@@ -4,13 +4,14 @@ const DIALOG_SYS_API = '/process_ajax';   //TO-DO: use ACTUAL dialog system API
 var submit_btn = document.getElementById('submit_btn');
 submit_btn.addEventListener('click',handle_submit);
 
-/* When the enter key is pressed when typing into inpu, handle_submit() */
+/* When the enter key is pressed when typing into input, handle_submit() */
 var input_box = document.getElementById('user_input_box');
 input_box.addEventListener('keyup',function(event){
    event.preventDefault();
    if (event.keyCode == 13) handle_submit();
 });
 
+/* Open connection for speach API when mic button hit */
 var mic_btn = document.getElementById('mic_btn');
 mic_btn.addEventListener('click',function(){
    var recognition = new webkitSpeechRecognition();
@@ -47,7 +48,7 @@ function send_input_to_dialog(inputText, callback){
    var fd = new FormData();
    fd.append('inputText',inputText);
    xhr.addEventListener("load", reqListener);
-   xhr.open('GET',DIALOG_SYS_API);
+   xhr.open('POST',DIALOG_SYS_API);
    xhr.send(fd);
 
 }
