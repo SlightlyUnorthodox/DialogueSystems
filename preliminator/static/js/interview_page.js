@@ -42,6 +42,8 @@ function handle_response(response){
 function send_input_to_dialog(inputText, callback){
    function reqListener () {
       callback(this.responseText);
+      var msg = new SpeechSynthesisUtterance(this.responseText);
+      window.speechSynthesis.speak(msg);
    }
 
    var xhr = new XMLHttpRequest();
