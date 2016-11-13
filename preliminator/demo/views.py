@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.shortcuts import render_to_response, render
@@ -14,10 +16,22 @@ from django.utils import dateformat
 
 import datetime
 import decimal
+import dialogue as dm
+import random
+import time
+import dialogue
+import threading 
 
 #import necessary models and forms
 from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 from .forms import CandidateForm, PreSurveyForm, PostSurveyForm
+
+# Prevent testing errors by setting defaults
+global interview_id
+global candidate_id
+interview_id = 1
+candidate_id = 1
+
 
 def index(request):
 	template = loader.get_template('index.html')
@@ -64,7 +78,7 @@ def initialize_interview(user, candidate):
 def candidate_form(request):
 	# Initialize candidate model variables
 	newFirstName = newLastName = newHighestEducation = newEducationStatus = newProgramField = newYearsExperience = newRelevantEmployer = ''
-	
+
 	# Check if POST request was made
 	if request.method == 'POST':
 
@@ -90,7 +104,7 @@ def candidate_form(request):
 
 			# Years experience
 			newYearsExperience = request.POST.get('yearsExperience')
-			
+
 			# Relevant employer
 			newRelevantEmployer = request.POST.get('relevantEmployer')
 
@@ -101,7 +115,7 @@ def candidate_form(request):
 			## ADD TEMPFIX FOR USER DEPENDENCY
 			##
 
-			# New User 
+			# New User
 			newDemoUser = User(
 				username = "demo_user",
 				password = "demo_password"
@@ -198,7 +212,7 @@ def pre_survey(request):
 			#return render(request, 'interview_page.html', {'form':form, 'state':state, 'interview': request.session.get('interview', None)})
 	else:
 		# Initialize candidate form
-		form = PostSurveyForm()
+		form = PreSurveyForm()
 
 	# Cycle initialized form
 	state = "Please enter pre-screening survey information"
@@ -207,22 +221,17 @@ def pre_survey(request):
 # 3. Interview Page - hosts dialogue for interview
 def interview_page(request):
 
-	# Confirm candidate and interview info forwarding
-	candidate = Candidate.objects.get(candidate_id = int(candidate_id))
-	interview = Interview.objects.get(interview_id = int(interview_id))
+	# Initialize dialogue manager
+	global dm
+	dm = dialogue.DialogueManager(candidate_id = candidate_id, interview_id = interview_id)
+	#dm = dialogue.DialogueManager()
 
-	print(candidate.first_name)
-	print(candidate.last_name)
-	print(candidate.highest_education)
-
-	print(interview.start_time)
-	print(interview.end_time)
-
+	# Hacky solution to start things
 	return render(request, 'interview_page.html', {'interview':request.session.get('interview', None)})
 
 # 4. Feedback Page - provides dialogue feedback for candidate and recruiter
 def feedback_page(request):
-	
+
 	return render(request, 'feedback_page.html', {'interview':request.session.get('interview', None)})
 
 # 5. Post Survey - post-dialogue user satisfaction survey
@@ -280,5 +289,39 @@ def post_survey(request):
 	state = "Please enter post-screening survey information"
 	return render(request, 'post_survey.html', {'form':form, 'state':state})
 
+"""
+Temporary response. Will call the dialog system instead.
+"""
 
+@csrf_exempt
+def process_ajax(request):
 
+	# Attempt to retrive input text from interview page
+	if request.method == 'POST': # and request.is_ajax():
+		if 'inputText' in request.POST:
+			user_utterance = request.POST['inputText']
+		else:
+			return HttpResponse('Missing User Input')
+	else:
+		return HttpResponse('Bad Request')
+
+	# Process user utterance
+	dm.process_speech(input = user_utterance)
+
+	# Arbitrary delay to simulate processing.
+	time.sleep(0.5) 
+
+	# If state is 'closing' stop sending system utterance
+	if (dm.dialogue_state == dm.end_state):
+		# Use utterance to indicate button to click
+		system_utterance = "The Preliminator Demo is now over. Please click on the 'See Feedback' button below."
+		
+	else:
+		# Set system utterance
+		system_utterance = dm.speak()
+		
+		# Iterate system state
+		dm.check_state()
+
+	# Render utterance to screen	
+	return HttpResponse(system_utterance)

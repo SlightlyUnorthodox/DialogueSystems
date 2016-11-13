@@ -1,32 +1,39 @@
 # brings the pieces together
 import chatUtil as util 
 
+# creates the conversation class that will pass along the information we need
+import re
+import random
+from nltk import compat
+
+
 class Conversation(object):
-	def __init__(self, responses, reflections={}):
-        
+    #generatedString = "";
+    def __init__(self, responses, reflections={}):
+        self.responses = [(re.compile(x, re.IGNORECASE),y) for (x,y) in responses]
+        self.reflections = reflections
+        #self.regex = self.compileReflections()
+
         # below is pulled from the nltk documentation website
         # pairs is a list of patterns and its responses
         # each pattern is a regex that matches user statement or q
         # ex: r'I want (.*)' then a list of answers is then given like
         # "why do you want %1"
-        """
-        Initialize the chatbot.  Pairs is a list of patterns and responses.  Each
-        pattern is a regular expression matching the user's statement or question,
-        e.g. r'I like (.*)'.  For each such pattern a list of possible responses
-        is given, e.g. ['Why do you like %1', 'Did you ever dislike %1'].  Material
-        which is matched by parenthesized sections of the patterns (e.g. .*) is mapped to
-        the numbered positions in the responses, e.g. %1.
+        
+        #Initialize the chatbot.  Pairs is a list of patterns and responses.  Each
+        #pattern is a regular expression matching the user's statement or question,
+        #e.g. r'I like (.*)'.  For each such pattern a list of possible responses
+        #is given, e.g. ['Why do you like %1', 'Did you ever dislike %1'].  Material
+        #which is matched by parenthesized sections of the patterns (e.g. .*) is mapped to
+        #the numbered positions in the responses, e.g. %1.
 
-        :type pairs: list of tuple
-        :param pairs: The patterns and responses
-        :type reflections: dict
-        :param reflections: A mapping between first and second person expressions
-        :rtype: None
-        """
-
-        self.responses = [(re.compile(x, re.IGNORECASE),y) for (x,y) in responses]
-        self.reflections = reflections
-        self.regex = self.compileReflections()
+        #:type pairs: list of tuple
+        #:param pairs: The patterns and responses
+        #:type reflections: dict
+        #:param reflections: A mapping between first and second person expressions
+        #:rtype: None
+        
+        
 
     def replace(self, str):
         """
@@ -79,4 +86,42 @@ class Conversation(object):
                 if resp[-2:] == '??': resp = resp[:-2] + '?'
                 return resp
 
+
     # Hold a conversation with a chatbot
+
+    def converse(self, quit="quit"):
+        input = ""
+        while input != quit:
+            input = quit
+            try: input = compat.raw_input(">")
+            except EOFError:
+                print(input)
+            if input:
+                while input[-1] in "!.": input = input[:-1]
+                print(self.respond(input))
+
+
+    # create string that needs to be passed to the chat bot via a .js file
+    # standy for bugs
+    def createJS():
+        return generatedString;
+    # Hold a conversation with a chatbot
+
+
+
+eliza_chatbot = Conversation(util.responses, util.reflections)
+
+def eliza_chat():
+    print("Therapist\n---------")
+    print("Talk to the program by typing in plain English, using normal upper-")
+    print('and lower-case letters and punctuation.  Enter "quit" when done.')
+    print('='*72)
+    print("Hello.  How are you feeling today?")
+
+    eliza_chatbot.converse()
+
+def demo():
+    eliza_chat()
+
+if __name__ == "__main__":
+    demo()

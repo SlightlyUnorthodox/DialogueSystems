@@ -1,4 +1,4 @@
-﻿<html>
+<html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
@@ -9,13 +9,11 @@
         <![endif]-->
     <title>Bootstrap Chat Box Example</title>
     <!-- BOOTSTRAP CORE STYLE CSS -->
-    <link href="../chat-box/assets/css/bootstrap.css" rel="stylesheet" />
+    <link href="stylesheets/bootstrap.css" rel="stylesheet" />
     <!-- FONT AWESOME  CSS -->
-    <link href="../chat-box/assets/css/font-awesome.css" rel="stylesheet" />
+    <link href="stylesheets/font-awesome.css" rel="stylesheet" />
     <!-- CUSTOM STYLE CSS -->
-    <link href="../chat-box/assets/css/style.css" rel="stylesheet" />
-
-    <script type="text/javascript" src="js/addChatText.js"></script>
+    <link href="stylesheets/style.css" rel="stylesheet" />
 </head>
 <body>
     <div class="container">
@@ -39,71 +37,30 @@
                             </div>
                     </div>
                     <div class="panel-body chat-box-main" id = "add-messages">
-                        <div class = "chatEntry">
-                            <div class="chat-box-left">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            </div>
-                            <div class="chat-box-name-left">
-                                <img src="../chat-box/assets/img/user.png" alt="bootstrap Chat box user image" class="img-circle" />
-                                -  Justine Goliyad
-                            </div>
-                            <hr class="hr-clas" />
-                        </div>
-                        <div class = "chatEntry">
-                            <div class="chat-box-right">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            </div>
-                            <div class="chat-box-name-right">
-                                <img src="../chat-box/assets/img/user.gif" alt="bootstrap Chat box user image" class="img-circle" />
-                                - Romin Royeelin
-                            </div>
-                            <hr class="hr-clas" />
-                        </div>
-                        <div class = "chatEntry">
-                            <div class="chat-box-right">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            </div>
-                            <div class="chat-box-name-right">
-                                <img src="../chat-box/assets/img/user.gif" alt="bootstrap Chat box user image" class="img-circle" />
-                                - Romin Royeelin
-                            </div>
-                            <hr class="hr-clas" />
-                        </div>
-                        <div class = "chatEntry">
-                            <div class="chat-box-right">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                               Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                            </div>
-                            <div class="chat-box-name-right">
-                                <img src="../chat-box/assets/img/user.gif" alt="bootstrap Chat box user image" class="img-circle" />
-                                - Romin Royeelin
-                            </div>
-                            <hr class="hr-clas" />
-                        </div>
                     </div>
                     <div class="chat-box-footer">
                         <div class="input-group">
-                            <input type="text" id="banana" class="form-control" placeholder="Enter Text Here...">
+                            <input type="text" id="user_input_box" class="form-control" placeholder="Enter Text Here...">
                             <span class="input-group-btn">
-                                <button class="btn btn-info" onclick = "pop(1)" type="button">SEND</button>
+                                <button class="btn btn-info" id="submit_btn" type="button" >SEND</button>
                             </span>
                         </div>
                     </div>
 
                 </div>
 
-            </div>            
+            </div>
         </div>
     </div>
 
+    <script type="text/javascript" src="javascripts/addChatText.js"></script>
+
+
     <!-- USING SCRIPTS BELOW TO REDUCE THE LOAD TIME -->
     <!-- CORE JQUERY SCRIPTS FILE -->
-    <script src="assets/js/jquery-1.11.1.js"></script>
+    <script src="javascripts/jquery-1.11.1.js"></script>
     <!-- CORE BOOTSTRAP SCRIPTS  FILE -->
-    <script src="assets/js/bootstrap.js"></script>
+    <script src="javascripts/bootstrap.js"></script>
 </body>
 
 </html>

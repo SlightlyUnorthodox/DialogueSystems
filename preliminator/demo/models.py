@@ -95,7 +95,8 @@ class Candidate(models.Model):
 	EDU_STATUS = (
 		('G', 'Graduated'),
 		('I', 'In Progress'),
-		('N', 'Not Complete')
+		('N', 'Not Complete'),
+		('X', 'NA'),
 	)
 
 	# Candidate's education status
