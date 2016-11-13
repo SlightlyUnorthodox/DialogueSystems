@@ -32,7 +32,7 @@ function send_input_to_dialog(inputText, callback){
 
    var xhr = new XMLHttpRequest();
    var fd = new FormData();
-   fd.append('somevar','someval');
+   fd.append('inputText',inputText);
    xhr.addEventListener("load", reqListener);
    xhr.open('GET',DIALOG_SYS_API);
    xhr.send(fd);
