@@ -16,74 +16,6 @@ likert_patterns_four =  "(?:[\s]|^)(four)(?=[\s]|$)"
 likert_patterns_five =  "(?:[\s]|^)(five)(?=[\s]|$)"
 gpa_patterns = "(?:[\s]|^)(point)(?=[\s]|$)"
 
-# Define dialogue pairs (prompt-response) for each state
-
-# Greeting state pairs
-greeting_pairs =  (
-	( "Hello, my name is Preliminator, what is your name?",
-	{
-		"name": "any input",
-	}),
-)
-
-# Resume-driven pairs
-resume_pairs = (
-	( "I didn't see you enter your GPA, to the best of your knowledge, what is your current GPA?",
-		{
-			"gpa": gpa_patterns,
-		}),
-)
-
-# Job-driven pairs
-job_pairs = (
-	( "On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Git?",
-		{
-		 1: likert_patterns_one,
-		 2: likert_patterns_two,
-		 3: likert_patterns_three,
-		 4: likert_patterns_four,
-		 5: likert_patterns_five,
-		}),
-)
-
-# Eligibility pairs
-eligibility_pairs = (
-	( "Are you a United States citizen?",
-		{
-		 "yes": affirmative_patterns,
-		 "no": negative_patterns,
-		}),
-	( "Will you at any time require visa-sponsorship to continue working?",
-		{
-		 "yes": affirmative_patterns,
-		 "no": negative_patterns,
-		}),
-	( "Are you a protected veteran?",
-		{
-		 "yes": affirmative_patterns,
-		 "no": negative_patterns,
-		}),
-	( "Have you ever been convicted of a felony?",
-		{
-		 "yes": affirmative_patterns,
-		 "no": negative_patterns,
-		}),
-	( "Do you require any disability-related accomodations?",
-		{
-		 "yes": affirmative_patterns,
-		 "no": negative_patterns,
-		}),
-)
-
-# Closing state pairs
-closing_pairs = (
-	( "Well I believe we are out of time. Thank you for taking the time to try the Preliminator demo and have a good day.",
-		{
-		"any":"any pattern",
-		}),
-
-)
-
 class DialogueManager:
 	def __init__(self, candidate_id = 1, interview_id = 1):
 
@@ -111,40 +43,111 @@ class DialogueManager:
 		self.initiative = 'system'
 		self.current_speaker = 'system'
 
-		# Dialogue component space information
-		self.state_set = collections.OrderedDict([
-			('greeting', [0, greeting_pairs]), # 0 - incomplete, 1 - complete
-			('resume', [0, resume_pairs]),
-			('job', [0, job_pairs]),
-			('eligibility', [0, eligibility_pairs]),
-			('closing', [0, closing_pairs]),
-		])
-
 		# Dialogue feature sets
 		self.resume_set = collections.OrderedDict([
-			('First Name', 0), # 0 - incomplete, 1 - complete
-			('Last Name', 0),
-			('Highest Education', 0),
-			('Education Status', 0),
-			('Major/Field', 0),
-			('Years Experience', 0),
-			('Relevant Employer', 0),
-			('Relevant Job Title', 0)
+			('first_name', [0, 'Candidate']), # 0 - incomplete, 1 - complete
+			('last_name', [0, '']),
+			('highest_education', [0, 'N']),
+			('education_status', [0, 'X']),
+			('program', [0, '']),
+			('years_experience', [0, 0]),
+			('relevant_job_employer', [0, '']),
+			('relevant_job_title', [0, '']),
 		])
 
 		self.skills_set = collections.OrderedDict([
-			('Java', 0), # 0 - na, 1-5 (strongly disagree to strongly agree)
-			('C++', 0),
-			('Databases', 0),
-			('Git', 0),
-			('Networking', 0),
+			('Java', [0, 0]), # 0 - na, 1-5 (strongly disagree to strongly agree)
+			('C++', [0, 0]),
+			('Databases', [0, 0]),
+			('Git', [0, 0]),
+			('Networking', [0, 0]),
 		])
 
 		self.eligibility_set = collections.OrderedDict([
-			('citizen', 0), # 0 - na, 1 - no, 2 - yes
-			('visa', 0), # 0 - na, 1 - not needed, 2 - needed
-			('disability', 0), # 0 - na, 1 - no, 2 - yes
-			('veteran', 0), # 0 - na, 1 - no, 2 - yes
+			('citizen', [0, 0]), # 0 - na, 1 - no, 2 - yes
+			('visa', [0, 0]), # 0 - na, 1 - not needed, 2 - needed
+			('disability', [0, 0]), # 0 - na, 1 - no, 2 - yes
+			('veteran', [0, 0]), # 0 - na, 1 - no, 2 - yes
+		])
+
+		# Populate candidate fields
+		self.__populate_fields()
+		
+		# Define dialogue pairs (prompt-response) for each state
+
+		# Greeting state pairs
+		self.greeting_pairs =  (
+			( "Hello " + str(self.resume_set['first_name'][1]) + ", my name is Preliminator. We'll be conducting a brief interview today. Ready to begin?",
+			{
+				"name": "any input",
+			}),
+		)
+
+		# Resume-driven pairs
+		self.resume_pairs = (
+			( "I didn't see you enter your GPA, to the best of your knowledge, what is your current GPA?",
+				{
+					"gpa": gpa_patterns,
+				}),
+		)
+
+		# Job-driven pairs
+		self.job_pairs = (
+			( "On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Git?",
+				{
+				 1: likert_patterns_one,
+				 2: likert_patterns_two,
+				 3: likert_patterns_three,
+				 4: likert_patterns_four,
+				 5: likert_patterns_five,
+				}),
+		)
+
+		# Eligibility pairs
+		self.eligibility_pairs = (
+			( "Are you a United States citizen?",
+				{
+				 "yes": affirmative_patterns,
+				 "no": negative_patterns,
+				}),
+			( "Will you at any time require visa-sponsorship to continue working?",
+				{
+				 "yes": affirmative_patterns,
+				 "no": negative_patterns,
+				}),
+			( "Are you a protected veteran?",
+				{
+				 "yes": affirmative_patterns,
+				 "no": negative_patterns,
+				}),
+			( "Have you ever been convicted of a felony?",
+				{
+				 "yes": affirmative_patterns,
+				 "no": negative_patterns,
+				}),
+			( "Do you require any disability-related accomodations?",
+				{
+				 "yes": affirmative_patterns,
+				 "no": negative_patterns,
+				}),
+		)
+
+		# Closing state pairs
+		self.closing_pairs = (
+			( "Well I believe we are out of time. Thank you for taking the time to try the Preliminator demo and have a good day.",
+				{
+				"any":"any pattern",
+				}),
+
+		)
+
+		# Dialogue component space information
+		self.state_set = collections.OrderedDict([
+			('greeting', [0, self.greeting_pairs]), # 0 - incomplete, 1 - complete
+			('resume', [0, self.resume_pairs]),
+			('job', [0, self.job_pairs]),
+			('eligibility', [0, self.eligibility_pairs]),
+			('closing', [0, self.closing_pairs]),
 		])
 
 		# Store recent utterances
@@ -168,6 +171,13 @@ class DialogueManager:
 
 		# System still has time
 		return(0)
+
+	def __populate_fields(self):
+		# Try and populate all resume fields
+		for key in self.resume_set:
+			if(self.resume_set[key][0] == 0):
+				self.resume_set[key] = [1, getattr(self.candidate, key)]
+				self.resume_set[key][0] = 1
 
 	def check_state(self):
 

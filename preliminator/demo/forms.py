@@ -30,10 +30,11 @@ class CandidateForm(forms.Form):
 	EDU_STATUS = (
 		('G', 'Graduated'),
 		('I', 'In Progress'),
-		('N', 'Not Complete')
+		('N', 'Not Complete'),
+		('X', 'NA')
 	)
 
-	educationStatus = forms.ChoiceField(choices = EDU_STATUS, label = 'Education Status', required = True, initial =  'I')
+	educationStatus = forms.ChoiceField(choices = EDU_STATUS, label = 'Education Status', required = True, initial =  'X')
 
 	programField = forms.CharField(label = 'Major/Field', min_length = 1, max_length = 50, required = False)
 	yearsExperience = forms.IntegerField(label = 'Years Experience', min_value = 1, max_value = 20, required = True)
