@@ -5,18 +5,17 @@
 
    <title>The Preliminator</title>
 
-   <!-- BOOTSTRAP CORE STYLE CSS -->
-   <!-- Latest compiled and minified CSS -->
+   <!-- Latest compiled and minified Bootstrap CSS -->
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
    <!-- CUSTOM STYLE CSS
    <link href="../static/css/style.css" rel="stylesheet" /> -->
-
    <link href="https://fonts.googleapis.com/css?family=Shrikhand" rel="stylesheet">
 </head>
+
+
+
 <body>
-
-
 <style>
 @import url('https://fonts.googleapis.com/css?family=Josefin+Sans:100,300,400,600,700|Titillium+Web:200,300,400,600,700');
 .chat-box-head {
@@ -81,100 +80,6 @@
    width: 30px;
    height: 30px;
 }
-/*.chat-box-name {
-   /*margin-top: 5%;
-   margin-left: 15%;
-   text-align:center;
-   color:#049E64;
-}
-
-
-.chat-box-right {
-   width: 100%;
-   height: auto;
-   padding: 15px;
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-   border-radius: 5px;
-   position: relative;
-   border: 1px solid #C5C5C5;
-   font-size:12px;
-}
-
-/*.chat-box-right:after {
-   top: 100%;
-   right: 10%;
-   border: solid transparent;
-   content: " ";
-   position: absolute;
-   border-top-color: #C5C5C5;
-   border-width: 15px;
-   margin-left: -15px;
-}
-
-.chat-box-name-right {
-   color: #354EA0;
-   margin-top: 30px;
-   margin-right: 60px;
-   text-align:right;
-}
-
-.chat-box-name-right img {
-   max-width:40px;
-   border: 2px solid #354EA0;
-}
-.chat-box-footer {
-   background-color: #D8D8D8;
-   padding: 10px;
-}
-/*======================================
-CHAT BOX ONLINE STYLES
-=======================================
-
-
-.hr-clas-low {
-   border-top: 1px solid #C5C5C5;
-}
-
-.chat-box-online {
-   max-height:554px;
-   overflow:auto;
-}
-.chat-box-online-div {
-   border:2px solid #03DB2F;
-   border-bottom:2px solid #03DB2F;
-}
-
-.chat-box-online-head {
-   padding: 10px 15px;
-   border-bottom: 2px solid #03DB2F;
-   background-color: #03DB2F;
-   color: #fff;
-   text-align: center;
-
-}
-
-.chat-box-online-left {
-   margin-left: 10px;
-   text-align:left;
-   color:#049E64;
-}
-.chat-box-online-left img {
-   max-width:30px;
-   border:1px solid #049E64;
-   margin-bottom:10px;
-}
-.chat-box-online-right {
-   margin-right: 10px;
-   text-align:right;
-   color:#354EA0;
-}
-.chat-box-online-right img {
-   max-width:30px;
-   border:1px solid #354EA0;
-   margin-bottom:10px;
-
-}*/
 </style>
 
 
@@ -221,7 +126,7 @@ CHAT BOX ONLINE STYLES
                   <span class="input-group-btn">
                      <button class="btn btn-info" id="submit_btn" type="button" >Send</button>
                   </span>
-                  <a class="mic_btn" href="#">
+                  <a class="mic_btn" href="#" id="mic_btn">
                      <img src="../static/media/mic.ico" class="mic_icon">
                   </a>
                </div>
@@ -234,13 +139,15 @@ CHAT BOX ONLINE STYLES
    </div>
 </div>
 
+<!-- Speech recognition wrapper API -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+<!-- Page interactivity JS -->
 <script type="text/javascript" src="../static/js/interview_page.js"></script>
 
 <!-- USING SCRIPTS BELOW TO REDUCE THE LOAD TIME -->
 <!-- CORE JQUERY SCRIPTS FILE -->
 <script src="../static/js/jquery-1.11.1.js"></script>
-<!-- CORE BOOTSTRAP SCRIPTS  FILE -->
-<script src="../static/js//bootstrap.js"></script>
+<!-- Latest compiled and minified Bootstrap JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </body>
-
 </html>

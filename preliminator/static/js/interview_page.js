@@ -11,6 +11,19 @@ input_box.addEventListener('keyup',function(event){
    if (event.keyCode == 13) handle_submit();
 });
 
+var mic_btn = document.getElementById('mic_btn');
+mic_btn.addEventListener('click',function(){
+   var recognition = new webkitSpeechRecognition();
+   recognition.onresult = function(event) {
+      document.getElementById('user_input_box').value = event.results[0][0].transcript;
+      handle_submit();
+      document.getElementById('user_input_box').placeholder = "Type your response, or click the microphone to speak";
+   }
+   recognition.start();
+   document.getElementById('user_input_box').placeholder = "Listening...";
+});
+
+
 /* Define what happens when the user submits their input */
 function handle_submit(){
    var inputText = document.getElementById('user_input_box').value;
@@ -67,7 +80,7 @@ function add_chat_entry(inputString, params){
    meta_chat_div.className = (params.source === "user")? "col-xs-1" : "col-xs-1 col-xs-offset-1";
    var pic_name_div = document.createElement('div');
    if(params.source === "user")
-      pic_name_div.className = "user-pic-n-name";
+   pic_name_div.className = "user-pic-n-name";
    var pic = document.createElement('img');
    var picSource = (params.source === "user")? "../static/media/user.png" : "../static/media/user.gif";
    pic.setAttribute('src', picSource);
