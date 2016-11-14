@@ -3,6 +3,7 @@ import datetime
 import threading
 #import views
 import collections
+import random
 
 from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
@@ -41,6 +42,7 @@ class DialogueManager:
 		self.initiative = 'system'
 		self.current_speaker = 'system'
 		self.grounding = False
+		self.bad_entry = False
 
 		# Dialogue feature sets
 		self.resume_set = collections.OrderedDict([
@@ -76,94 +78,104 @@ class DialogueManager:
 
 		# Greeting state pairs
 		self.greeting_acts =  (
-			(
-				["Hello " + str(self.resume_set['first_name'][1]) + ", my name is Preliminator. We'll be conducting a brief interview today. Ready to begin?",
+			{
+				'utterances': ["Hello " + str(self.resume_set['first_name'][1]) + ", my name is Preliminator. We'll be conducting a brief interview today. Ready to begin?",
 				"Hello " + str(self.resume_set['first_name'][1]) + ", I'll be conducting a brief screening interview. Ready to begin?"],
-				{
+				'patterns':{
 					"name": "any input",
 				},
-				["This is an example grounding sentence."]),
+				'grounding':["This is an example grounding sentence."]},
 		)
 
 		# Resume-driven pairs
 		self.resume_acts = (
-			( ["I didn't see you enter your GPA, to the best of your knowledge, what is your current GPA?",
+			{ 
+				'utterances': ["I didn't see you enter your GPA, to the best of your knowledge, what is your current GPA?",
 				"Would you mind sharing your expected GPA at time of graduation?"],
-				{
+				'patterns':{
 					"gpa": gpa_patterns,
 				},
-				["This is an example grounding sentence."]),
+				'grounding':["This is an example grounding sentence."]},
 		)
 
 		# Job-driven pairs
 		self.job_acts = (
-			( ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Git?",
+			{
+				'utterances': ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Git?",
 				"If you had to rate your experience with Git or Github on a scale of 1 (low) to 5 (high), what would you rate it?"],
-				{
+				'patterns':{
 				 1: likert_patterns_one,
 				 2: likert_patterns_two,
 				 3: likert_patterns_three,
 				 4: likert_patterns_four,
 				 5: likert_patterns_five,
 				},
-				["This is an example grounding sentence."]),
-			( ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Java?",
+				'grounding':["This is an example grounding sentence."]},
+			{ 
+				'utterances': ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Java?",
 				"If you had to rate your experience with Java on a scale of 1 (low) to 5 (high), what would you rate it?"],
-				{
+				'patterns':{
 				 1: likert_patterns_one,
 				 2: likert_patterns_two,
 				 3: likert_patterns_three,
 				 4: likert_patterns_four,
 				 5: likert_patterns_five,
 				},
-				["This is an example grounding sentence."]),
+				'grounding':["This is an example grounding sentence."]},
 		)
 
 
 		# Eligibility pairs
 		self.eligibility_acts = (
-			( ["Are you a United States citizen?", 
+			{ 
+				'utterances':["Are you a United States citizen?", 
 				"Are you eligible for employment in the United States?"],
-				{
+				'patterns':{
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				["This is an example grounding sentence."]),
-			( ["Will you at any time require visa-sponsorship to continue working?",
+				'grounding':["This is an example grounding sentence."]},
+			{ 
+				'utterances':["Will you at any time require visa-sponsorship to continue working?",
 				"Do you require visa-sponsorship to work in the US?"],
-				{
+				'patterns':{
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				["This is an example grounding sentence."]),
-			( ["Are you a protected veteran?"],
-				{
+				'grounding':["This is an example grounding sentence."]},
+			{ 
+				'utterances':["Are you a United States citizen?", 
+				"Are you eligible for employment in the United States?"],
+				'patterns':{
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				["This is an example grounding sentence."]),
-			( ["Have you ever been convicted of a felony?"],
-				{
+				'grounding':["This is an example grounding sentence."]},
+			{ 
+				'utterances':["Have you ever been convicted of a felony?"],
+				'patterns':{
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				["This is an example grounding sentence."]),
-			( ["Do you require any accomodations in order to complete your work?"
+				'grounding':["This is an example grounding sentence."]},
+			{ 
+				'utterances':["Do you require any accomodations in order to complete your work?"
 				"Will you need any accomodations to complete the work described?"],
-				{
+				'patterns':{
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				["This is an example grounding sentence."]),
+				'grounding':["This is an example grounding sentence."]},
 		)
 
 		# Closing state pairs
 		self.closing_acts = (
-			( ["Well I believe we are out of time. Thank you for taking the time to try the Preliminator demo and have a good day."],
-				{
+			{ 
+				'utterances':["Well I believe we are out of time. Thank you for taking the time to try the Preliminator demo and have a good day."],
+				'patterns':{
 				"any":"any pattern",
 				},
-				["This is an example grounding sentence."]),
+				'grounding':["This is an example grounding sentence."]},
 
 		)
 
@@ -207,15 +219,18 @@ class DialogueManager:
 
 	def check_state(self):
 
-		if self.grounding == False:
+
+		# If grounding is True, don't change state, run grounding utterance
+		if self.grounding == False and self.bad_entry == False:
+
 			# Check to see if current state has remaining utterances ## TODO: make more sophisticated
-			if ((self.dialogue_state_utterance + 1) >= len(self.state_set[self.dialogue_state][1])):
+			if ((self.dialogue_state_act + 1) >= len(self.state_set[self.dialogue_state][1])):
 				# If no more utterances, mark state complete
 				self.state_set[self.dialogue_state][0] = 1
-				self.dialogue_state_utterance = 0		
+				self.dialogue_state_act = 0		
 			else:
 				# Otherwise, increment current utterance
-				self.dialogue_state_utterance += 1
+				self.dialogue_state_act += 1
 
 			# Assign current state as first zero-completion state
 			for key in self.state_set:
@@ -224,18 +239,23 @@ class DialogueManager:
 
 				if (self.state_set[key][0] == 0):
 					self.dialogue_state = key
+					self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'])))
 					print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
 					return
 
 			# If all states complete, default to closing
 			self.dialogue_state = 'closing'
 
+			return
+		elif self.bad_entry == False:
+			# Print 'bad_entry utterance'
+			print("Got bad entry")
+
+		else:
+			# If grounding, restate user input ## TODO: Change to random grounding statement
+			self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['grounding'])))
 			print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
 			return
-		else:
-			# If grounding, restate user input
-			self
-
 	## Automatic Speech Recognition (ASR) Methods
 	
 	# Recieves text from API
@@ -257,6 +277,10 @@ class DialogueManager:
 		self.current_user_utterance = input
 		print("Received input: " + self.current_user_utterance + "\n")
 
+		# Set 'grounding' bit if necessary
+
+
+		# Set 'bad_entry' bit if necessary
 
 		# Change system state
 		self.system_state = 'speaking'
@@ -292,7 +316,7 @@ class DialogueManager:
 		# while 1:
 		# 	pass
 
-		self.current_system_utterance = self.state_set[self.dialogue_state][1][self.dialogue_state_utterance][0]
+		self.current_system_utterance = self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'][self.dialogue_state_utterance]
 
 		system_utterance = self.generate_speech(utterance = self.current_system_utterance)
 		
