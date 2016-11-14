@@ -165,15 +165,6 @@ class DialogueManager:
 				'grounding':["Did you say: "],
 				'bad_entry':["Please enter a value 'yes' or 'no'."]},
 			{ 
-				'utterances':["Are you a United States citizen?", 
-				"Are you eligible for employment in the United States?"],
-				'patterns':{
-				 "yes": affirmative_patterns,
-				 "no": negative_patterns,
-				},
-				'grounding':["Did you say: "],
-				'bad_entry':["Please enter a value 'yes' or 'no'."]},
-			{ 
 				'utterances':["Have you ever been convicted of a felony?"],
 				'patterns':{
 				 "yes": affirmative_patterns,
@@ -279,6 +270,10 @@ class DialogueManager:
 			self.dialogue_state = 'closing'
 			return
 
+		# Catch 'back' instance
+		# if self.current_user_utterance.find("back") > 0:
+		# 	self.dialogue_state
+
 		# Prevent death spirals
 		if self.cycle_timeout >= 2:
 			self.dialogue_phrase = 'utterances'
@@ -286,6 +281,8 @@ class DialogueManager:
 			self.proceed = True
 			self.check_state()
 			return
+		elif self.dialogue_phrase == 'bad_entry':
+			self.dialogue_phrase = 'utterances'
 
 		# # Open the pod bay doors
 		# if self.current_user_utterance == 'open the pod bay doors'
@@ -370,7 +367,7 @@ class DialogueManager:
 				return
 			
 			elif self.dialogue_phrase == 'bad_entry':
-
+				print("CHECK: bad_entry")
 				# Set back to utterances, don't iterate, and retry
 				self.dialogue_phrase == 'utterances'
 				self.cycle_timeout += 1
