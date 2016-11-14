@@ -294,7 +294,7 @@ class DialogueManager:
 		print("Dialogue State: " + str(self.dialogue_state) + "\n")
 
 		# Only run processing on select states
-		if self.dialogue_state in ('resume', 'job', 'eligibility'): # ('resume', 'job', 'eligibility')
+		if self.dialogue_state in ('resume', 'job'): # ('resume', 'job', 'eligibility')
 
 			# Check if user input makes sense
 			if self.dialogue_phrase == 'utterances': # and self.validation == True:
