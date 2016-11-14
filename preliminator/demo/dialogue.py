@@ -37,6 +37,7 @@ class DialogueManager:
 		self.dialogue_state = 'greeting'
 		self.dialogue_state_act = 0 # Indicates index of 
 		self.dialogue_state_utterance = 0
+		self.dialogue_phrase = 'utterances'
 		self.grounding_active = 0 # If 1, indicates grounding state should be evaluated before continuing
 		self.end_state = 'closing'
 		self.initiative = 'system'
@@ -240,20 +241,23 @@ class DialogueManager:
 				if (self.state_set[key][0] == 0):
 					self.dialogue_state = key
 					self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'])))
+					self.dialogue_phrase = 'utterances'
 					print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
 					return
 
 			# If all states complete, default to closing
+			self.dialogue_phrase = 'utterances'
 			self.dialogue_state = 'closing'
 
 			return
-		elif self.bad_entry == False:
+		elif self.bad_entry == True:
 			# Print 'bad_entry utterance'
 			print("Got bad entry")
 
 		else:
 			# If grounding, restate user input ## TODO: Change to random grounding statement
 			self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['grounding'])))
+			self.dialogue_phrase = 'grounding'
 			print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
 			return
 	## Automatic Speech Recognition (ASR) Methods
@@ -278,7 +282,13 @@ class DialogueManager:
 		print("Received input: " + self.current_user_utterance + "\n")
 
 		# Set 'grounding' bit if necessary
+		if self.grounding == True:
 
+			# Add check grounding function
+			self.grounding = False
+
+		elif self.dialogue_state in ('resume', 'job'):
+			self.grounding = True
 
 		# Set 'bad_entry' bit if necessary
 
@@ -316,7 +326,7 @@ class DialogueManager:
 		# while 1:
 		# 	pass
 
-		self.current_system_utterance = self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'][self.dialogue_state_utterance]
+		self.current_system_utterance = self.state_set[self.dialogue_state][1][self.dialogue_state_act][self.dialogue_phrase][self.dialogue_state_utterance]
 
 		system_utterance = self.generate_speech(utterance = self.current_system_utterance)
 		
