@@ -1,21 +1,22 @@
 import nltk
 import datetime
 import threading
-#import views
 import collections
 import random
+import re
 
 from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
 # TODO: Expand as more patterns are identified
-affirmative_patterns = "(?:[\s]|^)(yes|mhm|uhuh)(?=[\s]|$)"
-negative_patterns = "(?:[\s]|^)(no)(?=[\s]|$)"
-likert_patterns_one =  "(?:[\s]|^)(one)(?=[\s]|$)"
-likert_patterns_two =  "(?:[\s]|^)(two)(?=[\s]|$)"
-likert_patterns_three =  "(?:[\s]|^)(three)(?=[\s]|$)"
-likert_patterns_four =  "(?:[\s]|^)(four)(?=[\s]|$)"
-likert_patterns_five =  "(?:[\s]|^)(five)(?=[\s]|$)"
-gpa_patterns = "(?:[\s]|^)(point)(?=[\s]|$)"
+affirmative_patterns = re.compile("yes|mhm|uhuh|okay")
+negative_patterns = re.compile("no")
+any_pattern = re.compile(".?")
+likert_patterns_one =  re.compile("one|1")
+likert_patterns_two =  re.compile("two|2")
+likert_patterns_three =  re.compile("three|3")
+likert_patterns_four =  re.compile("four|4")
+likert_patterns_five =  re.compile("five|5")
+gpa_patterns = re.compile("([zero|one|two|three|four]\bpoint\b[zero|one|two|three|four|five|six|seven|eight|nine])|([0-4]\.\d{2})")
 
 class DialogueManager:
 	def __init__(self, candidate_id = 1, interview_id = 1):
@@ -33,7 +34,6 @@ class DialogueManager:
 		self.interview = Interview.objects.get(interview_id = int(interview_id))
 
 		# Dialogue state information
-		self.system_state = 'speaking'
 		self.dialogue_state = 'greeting'
 		self.dialogue_state_act = 0 # Indicates index of 
 		self.dialogue_state_utterance = 0
@@ -42,8 +42,14 @@ class DialogueManager:
 		self.end_state = 'closing'
 		self.initiative = 'system'
 		self.current_speaker = 'system'
-		self.grounding = False
-		self.bad_entry = False
+		self.proceed = False
+		self.cycle_timeout = 0
+
+		# Store recent utterances
+		self.current_system_utterance = ""
+		self.current_user_utterance = ""
+		self.user_response = ""
+		self.user_response_value = ""
 
 		# Dialogue feature sets
 		self.resume_set = collections.OrderedDict([
@@ -83,9 +89,10 @@ class DialogueManager:
 				'utterances': ["Hello " + str(self.resume_set['first_name'][1]) + ", my name is Preliminator. We'll be conducting a brief interview today. Ready to begin?",
 				"Hello " + str(self.resume_set['first_name'][1]) + ", I'll be conducting a brief screening interview. Ready to begin?"],
 				'patterns':{
-					"name": "any input",
+					"name": any_pattern,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':["To end the demo at any time, please speak or enter 'quit'. Thank you."],
+				'bad_entry':["No bad entry"]},
 		)
 
 		# Resume-driven pairs
@@ -96,7 +103,8 @@ class DialogueManager:
 				'patterns':{
 					"gpa": gpa_patterns,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':["You entered your GPA as " + str(self.user_response_value) + ", yes?"],
+				'bad_entry':["Please enter GPA as either '#.#' or 'number point number'"]},
 		)
 
 		# Job-driven pairs
@@ -111,7 +119,8 @@ class DialogueManager:
 				 4: likert_patterns_four,
 				 5: likert_patterns_five,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':["You entered the value " + str(self.user_response_value) + ", did you not?"],
+				'bad_entry':["Please enter a value from '1' to '5' or 'one' to 'five'."]},
 			{ 
 				'utterances': ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Java?",
 				"If you had to rate your experience with Java on a scale of 1 (low) to 5 (high), what would you rate it?"],
@@ -122,7 +131,8 @@ class DialogueManager:
 				 4: likert_patterns_four,
 				 5: likert_patterns_five,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':["You entered the value " + str(self.user_response_value) + ", did you not?"],
+				'bad_entry':["Please enter a value from '1' to '5' or 'one' to 'five'."]},
 		)
 
 
@@ -135,7 +145,8 @@ class DialogueManager:
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':[str(self.user_response_value) + "?"],
+				'bad_entry':["Please enter a value 'yes' or 'no'."]},
 			{ 
 				'utterances':["Will you at any time require visa-sponsorship to continue working?",
 				"Do you require visa-sponsorship to work in the US?"],
@@ -143,7 +154,8 @@ class DialogueManager:
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':[str(self.user_response_value) + "?"],
+				'bad_entry':["Please enter a value 'yes' or 'no'."]},
 			{ 
 				'utterances':["Are you a United States citizen?", 
 				"Are you eligible for employment in the United States?"],
@@ -151,14 +163,16 @@ class DialogueManager:
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':[str(self.user_response_value) + "?"],
+				'bad_entry':["Please enter a value 'yes' or 'no'."]},
 			{ 
 				'utterances':["Have you ever been convicted of a felony?"],
 				'patterns':{
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':[str(self.user_response_value) + "?"],
+				'bad_entry':["Please enter a value 'yes' or 'no'."]},
 			{ 
 				'utterances':["Do you require any accomodations in order to complete your work?"
 				"Will you need any accomodations to complete the work described?"],
@@ -166,7 +180,8 @@ class DialogueManager:
 				 "yes": affirmative_patterns,
 				 "no": negative_patterns,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':[str(self.user_response_value) + "?"],
+				'bad_entry':["Please enter a value 'yes' or 'no'."]},
 		)
 
 		# Closing state pairs
@@ -174,9 +189,10 @@ class DialogueManager:
 			{ 
 				'utterances':["Well I believe we are out of time. Thank you for taking the time to try the Preliminator demo and have a good day."],
 				'patterns':{
-				"any":"any pattern",
+				"any": any_pattern,
 				},
-				'grounding':["This is an example grounding sentence."]},
+				'grounding':["This is an example grounding sentence."],
+				'bad_entry':["Please enter a value 'yes' or 'no'."]},
 
 		)
 
@@ -188,10 +204,6 @@ class DialogueManager:
 			('eligibility', [0, self.eligibility_acts]),
 			('closing', [0, self.closing_acts]),
 		])
-
-		# Store recent utterances
-		self.current_system_utterance = ""
-		self.current_user_utterance = ""
 
 	## Dialogue Manager Utilities
 
@@ -218,183 +230,144 @@ class DialogueManager:
 				self.resume_set[key] = [1, getattr(self.candidate, key)]
 				self.resume_set[key][0] = 1
 
-	def check_state(self):
+	def __check_state(self):
 
-
-		# If grounding is True, don't change state, run grounding utterance
-		if self.grounding == False and self.bad_entry == False:
-
-			# Check to see if current state has remaining utterances ## TODO: make more sophisticated
-			if ((self.dialogue_state_act + 1) >= len(self.state_set[self.dialogue_state][1])):
-				# If no more utterances, mark state complete
-				self.state_set[self.dialogue_state][0] = 1
-				self.dialogue_state_act = 0		
-			else:
-				# Otherwise, increment current utterance
-				self.dialogue_state_act += 1
-
-			# Assign current state as first zero-completion state
-			for key in self.state_set:
-				#print("Key: " + key)
-				#print(self.state_set[key][0])
-
-				if (self.state_set[key][0] == 0):
-					self.dialogue_state = key
-					self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'])))
-					self.dialogue_phrase = 'utterances'
-					print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
-					return
-
-			# If all states complete, default to closing
-			self.dialogue_phrase = 'utterances'
-			self.dialogue_state = 'closing'
-
-			return
-		elif self.bad_entry == True:
-			# Print 'bad_entry utterance'
-			print("Got bad entry")
-
+		# Check to see if current state has remaining utterances ## TODO: make more sophisticated
+		if ((self.dialogue_state_act + 1) >= len(self.state_set[self.dialogue_state][1])):
+			# If no more utterances, mark state complete
+			self.state_set[self.dialogue_state][0] = 1
+			self.dialogue_state_act = 0		
 		else:
-			# If grounding, restate user input ## TODO: Change to random grounding statement
-			self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['grounding'])))
-			self.dialogue_phrase = 'grounding'
-			print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
-			return
+			# Otherwise, increment current utterance
+			self.dialogue_state_act += 1
+
+		# Assign current state as first zero-completion state
+		for key in self.state_set:
+			#print("Key: " + key)
+			#print(self.state_set[key][0])
+
+			if (self.state_set[key][0] == 0):
+				self.dialogue_state = key
+				self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'])))
+				print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
+				return
+
+		# If all states complete, default to closing
+		self.dialogue_state = 'closing'
+
 	## Automatic Speech Recognition (ASR) Methods
-	
-	# Recieves text from API
-	def listen(self):
-		
-		# TODO: Implement back into views
-		#current_user_utterance = views.receive_chat_text
-
-		# Use text listener for now
-		user_input = raw_input()
-
-		# Pass input to dialogue manager for parsing
-		self.process_speech(user_input)
 
 	# Processes text into dialogue manager
 	def process_speech(self, input):
 		
 		# Do something with input
-		self.current_user_utterance = input
+		self.current_user_utterance = input.lower()
+
+		# Catch quit instance
+		if self.current_user_utterance == 'quit':
+			self.dialogue_state = 'closing'
+			return
+
+		# Prevent death spirals
+		if self.cycle_timeout >= 3:
+			self.dialogue_phrase = 'utterances'
+			self.proceed = True
+			return
+
+		# # Open the pod bay doors
+		# if self.current_user_utterance == 'open the pod bay doors'
+		# 	# Design easter egg here
+		# 	return
+
 		print("Received input: " + self.current_user_utterance + "\n")
+		print("Dialogue Phrase: " + str(self.dialogue_phrase) + "\n")
+		print("Dialogue State: " + str(self.dialogue_state) + "\n")
 
-		# Set 'grounding' bit if necessary
-		if self.grounding == True:
+		# Only run processing on select states
+		if self.dialogue_state in ('job', 'eligibility'): # ('resume', 'job', 'eligibility')
 
-			# Add check grounding function
-			self.grounding = False
+			# Check if user input makes sense
+			if self.dialogue_phrase == 'utterances':
 
-		elif self.dialogue_state in ('resume', 'job'):
-			self.grounding = True
+				# Check for matching patterns
+				for key in self.state_set[self.dialogue_state][1][self.dialogue_state_act]['patterns']:
+					
+					# Compile regex pattern and check for match
+					pattern = self.state_set[self.dialogue_state][1][self.dialogue_state_act]['patterns'][key]
+					if re.search(pattern, self.current_user_utterance):
+						print("Key: " + str(key))
 
-		# Set 'bad_entry' bit if necessary
+						self.user_response = key
+						# Get matching value
+						self.user_response_value = pattern.findall(self.current_user_utterance)
 
-		# Change system state
-		self.system_state = 'speaking'
+						#self.bad_entry = False
 
-		return(0)
+						self.dialogue_phrase ='grounding'
+						self.proceed = False
+
+						# End process
+						return
+
+				self.dialogue_phrase = 'bad_entry'
+				self.proceed = False
+				# End process
+				return
+
+			# Otherwise reconcile grounding or bad state
+			elif self.dialogue_phrase == 'grounding':
+				
+				# Check for affirmative string
+				pattern = affirmative_patterns
+				if re.search(pattern, self.current_user_utterance):
+					self.user_response_value = pattern.findall(self.current_user_utterance)
+					
+					# Iterate dialogue state
+					self.proceed = True
+					self.utterances = True
+
+					# End process
+					return
+
+				self.dialogue_phrase = 'utterances'
+				self.proceed = False
+
+				# End process
+				return
+			
+			elif self.dialogue_phrase == 'bad_entry':
+
+				# Set back to utterances, don't iterate, and retry
+				self.dialogue_phrase == 'utterances'
+				self.proceed = False
+
+				# End process
+				return
+
+		# Iterate dialogue state
+		self.proceed = True
+
+		# End process
+		return
 
 	## Speech Synthesis Methods
 	
-	# Sends selected text to speech synthesis API
-	def generate_speech(self, utterance):
-		# Call to speech synthesis api
-		# we don't want to make the http rsponse live here though
-		print("System: " + str(utterance) + "\n")
-
-		return(utterance)
-
 	# Selects utterance to use
 	def speak(self):
 
-		# Check system state
+		# Check timeout
+		self.__check_timeout()
 
-		# TODO: Implement multi-threading for interruption listener
-		# try:
-		# 	# # Start to generate speech for utterance
-		# 	# thread.start_new_thread()
+		# Update current system utterance
+		self.current_system_utterance = random.choice(self.state_set[self.dialogue_state][1][self.dialogue_state_act][self.dialogue_phrase]) # [self.dialogue_state_utterance]
 
-		# 	# # Keep thread open for interruption or timeout
-		# 	# thread.start_new_thread()
-		# except:
-		# 	# Generate speech set for interruption
-		# 	self.generate_speech(utterance = "Yes?")
+		# Log system utterance
+		print("System: " + str(self.current_system_utterance) + "\n")
 
-		# while 1:
-		# 	pass
-
-		self.current_system_utterance = self.state_set[self.dialogue_state][1][self.dialogue_state_act][self.dialogue_phrase][self.dialogue_state_utterance]
-
-		system_utterance = self.generate_speech(utterance = self.current_system_utterance)
-		
-		# Change system state
-		self.system_state = 'listening'
-
-		return(system_utterance)
-	
-	## Run Dialogue Manager
-
-	def run(self):
-
-		# Log demo run text
-		print("Preliminator\n------------")
-		print("Carry out pre-screening interview by typing or speaking in plain English.\n")
-		print("When done, type or say, 'quit'.\n\n")
-
-		# Print/Speak opening line
-		# TODO: Uncommend
-		#self.generate_speech(str("Hello " + self.candidate_id.first_name + ". My name is Preliminator. I will be conducting a brief screening interview today."))
-		#self.generate_speech(str("Hello Candidate. My name is Preliminator. I will be conducting a brief screening interview today."))
-		#self.state_set['greeting'][0] = 1
-
-		# Start dialogue
-		while 1:
-
-			print("System state = " + self.system_state)
-			print("Current state = " + self.dialogue_state + "\n")
-
-			# If system state is 'Speaking', use system initiative
-			if(self.system_state == 'speaking'):
-				
-				self.speak()
-
-			# If system state is 'Interrupted', use user initiative
-			elif (self.system_state == 'interrupted'):
-				
-				# Response to interrupted with query
-				self.generate_speech("Yes?")
-
-				# Set state to 'Listenening'
-				self.system_state = 'listening'
-
-			# If system state is 'Listening', use user initiative
-			else:
-			
-				self.listen()
-
-				# If 'quit' entered, exit dialogue
-				if(self.current_user_utterance == "quit"):
-					return(0)
-
-			# Check for end conditions
-
-			# Timeout
-			if(self.__check_timeout() == 1):
-				print("System Concluding\n")
-				self.system_state = 'closing'
-
-
-			# State based (needs refinement)
-			if(self.dialogue_state == 'closing'):
-			 	return(0)
-			
-
-
+		# Check state iteration
+		if self.proceed == True:
 			self.__check_state()
 
-
-# dlg = DialogueManager()
-# dlg.run()
+		# Return system utterance to front-end
+		return(self.current_system_utterance)
+	

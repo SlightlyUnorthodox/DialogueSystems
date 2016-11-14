@@ -320,8 +320,5 @@ def process_ajax(request):
 		# Set system utterance
 		system_utterance = dm.speak()
 		
-		# Iterate system state
-		dm.check_state()
-
 	# Render utterance to screen	
 	return HttpResponse(system_utterance)
