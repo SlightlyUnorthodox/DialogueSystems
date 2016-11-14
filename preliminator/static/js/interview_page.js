@@ -1,6 +1,45 @@
 const DIALOG_SYS_API = '/process_ajax';   //TO-DO: use ACTUAL dialog system API
+var TOGGLE_SPEECH_SYNTHESIS = false;
 
-/* When the button is clicked, handle_submit() */
+/* Initial chat instructions */
+setTimeout(function(){
+   add_chat_entry(
+      'Welcome to the Preliminator',
+      {'source':'system'}
+   );
+
+   setTimeout(function(){
+      add_chat_entry(
+         'You may interact with the system by typing your responses,' +
+         'or by clicking the microphone icon and speaking',
+         {'source':'system'}
+      );
+
+      setTimeout(function(){
+         add_chat_entry(
+            'You can toggle speech synthesis on or off through the ' +
+            '<i>options</i> dropdown above.',
+            {'source':'system'}
+         );
+
+         setTimeout(function(){
+            add_chat_entry(
+               'To begin, send a response saying "ready"',
+               {'source':'system'}
+            );
+         },3500);
+
+      },3500);
+
+   },1500);
+
+},250);
+
+
+
+
+
+/* When the submit button is clicked, handle_submit() */
 var submit_btn = document.getElementById('submit_btn');
 submit_btn.addEventListener('click',handle_submit);
 
@@ -24,6 +63,13 @@ mic_btn.addEventListener('click',function(){
    document.getElementById('user_input_box').placeholder = "Listening...";
 });
 
+var toggle_sound = document.getElementById('toggle_sound');
+toggle_sound.addEventListener('click',function(){
+   TOGGLE_SPEECH_SYNTHESIS = !TOGGLE_SPEECH_SYNTHESIS;
+   document.getElementById('toggle_sound_glyphicon').className = (TOGGLE_SPEECH_SYNTHESIS)? "glyphicon glyphicon-check" : "glyphicon glyphicon-unchecked";
+   document.getElementById('audio_glyph').className = (TOGGLE_SPEECH_SYNTHESIS)? "glyphicon glyphicon-volume-up" : "glyphicon glyphicon-volume-off";
+
+});
 
 /* Define what happens when the user submits their input */
 function handle_submit(){
@@ -42,8 +88,10 @@ function handle_response(response){
 function send_input_to_dialog(inputText, callback){
    function reqListener () {
       callback(this.responseText);
-      var msg = new SpeechSynthesisUtterance(this.responseText);
-      window.speechSynthesis.speak(msg);
+      if(TOGGLE_SPEECH_SYNTHESIS){
+         var msg = new SpeechSynthesisUtterance(this.responseText);
+         window.speechSynthesis.speak(msg);
+      }
    }
 
    var xhr = new XMLHttpRequest();

@@ -35,7 +35,7 @@ class DialogueManager:
 
 		# Dialogue state information
 		self.dialogue_state = 'greeting'
-		self.dialogue_state_act = 0 # Indicates index of 
+		self.dialogue_state_act = 0 # Indicates index of
 		self.dialogue_state_utterance = 0
 		self.dialogue_phrase = 'utterances'
 		self.grounding_active = 0 # If 1, indicates grounding state should be evaluated before continuing
@@ -80,7 +80,7 @@ class DialogueManager:
 
 		# Populate candidate fields
 		self.__populate_fields()
-		
+
 		# Define dialogue pairs (prompt-response) for each state
 
 		# Greeting state pairs
@@ -105,7 +105,7 @@ class DialogueManager:
 
 		# Resume-driven pairs
 		self.resume_acts = (
-			{ 
+			{
 				'utterances': ["I didn't see you enter your GPA, to the best of your knowledge, what is your current GPA?",
 				"Would you mind sharing your expected GPA at time of graduation?"],
 				'patterns':{
@@ -129,7 +129,7 @@ class DialogueManager:
 				},
 				'grounding':["Did you say: "],
 				'bad_entry':["Please enter a value from '1' to '5' or 'one' to 'five'."]},
-			{ 
+			{
 				'utterances': ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Java?",
 				"If you had to rate your experience with Java on a scale of 1 (low) to 5 (high), what would you rate it?"],
 				'patterns':{
@@ -146,8 +146,8 @@ class DialogueManager:
 
 		# Eligibility pairs
 		self.eligibility_acts = (
-			{ 
-				'utterances':["Are you a United States citizen?", 
+			{
+				'utterances':["Are you a United States citizen?",
 				"Are you eligible for employment in the United States?"],
 				'patterns':{
 				 "yes": affirmative_patterns,
@@ -155,7 +155,7 @@ class DialogueManager:
 				},
 				'grounding':["Did you say: "],
 				'bad_entry':["Please enter a value 'yes' or 'no'."]},
-			{ 
+			{
 				'utterances':["Will you at any time require visa-sponsorship to continue working?",
 				"Do you require visa-sponsorship to work in the US?"],
 				'patterns':{
@@ -164,7 +164,7 @@ class DialogueManager:
 				},
 				'grounding':["Did you say: "],
 				'bad_entry':["Please enter a value 'yes' or 'no'."]},
-			{ 
+			{
 				'utterances':["Have you ever been convicted of a felony?"],
 				'patterns':{
 				 "yes": affirmative_patterns,
@@ -172,7 +172,7 @@ class DialogueManager:
 				},
 				'grounding':["Did you say: "],
 				'bad_entry':["Please enter a value 'yes' or 'no'."]},
-			{ 
+			{
 				'utterances':["Do you require any accomodations in order to complete your work?",
 				"Will you need any accomodations to complete the work described?"],
 				'patterns':{
@@ -185,7 +185,7 @@ class DialogueManager:
 
 		# Closing state pairs
 		self.closing_acts = (
-			{ 
+			{
 				'utterances':["Well I believe we are out of time. Thank you for taking the time to try the Preliminator demo and have a good day."],
 				'patterns':{
 				"any": any_pattern,
@@ -235,7 +235,7 @@ class DialogueManager:
 		if ((self.dialogue_state_act + 1) >= len(self.state_set[self.dialogue_state][1])):
 			# If no more utterances, mark state complete
 			self.state_set[self.dialogue_state][0] = 1
-			self.dialogue_state_act = 0		
+			self.dialogue_state_act = 0
 		else:
 			# Otherwise, increment current utterance
 			self.dialogue_state_act += 1
@@ -256,7 +256,7 @@ class DialogueManager:
 
 	# Processes text into dialogue manager
 	def process_speech(self, input):
-		
+
 		# # Check state iteration
 		# if self.proceed == True:
 		# 	print("RUNNING: Check State")
@@ -319,7 +319,7 @@ class DialogueManager:
 							self.user_response_value = str(match[0][0])
 						except:
 							print("MATCH EXCEPTION: " + str(key))
-							self.user_response_value = key				
+							self.user_response_value = key
 						#self.bad_entry = False
 
 						self.dialogue_phrase ='grounding'
@@ -344,7 +344,7 @@ class DialogueManager:
 
 			# Otherwise reconcile grounding or bad state
 			elif self.dialogue_phrase == 'grounding':
-				
+
 				# Check for affirmative string
 				pattern = affirmative_patterns
 				if re.search(pattern, self.current_user_utterance):
@@ -365,7 +365,7 @@ class DialogueManager:
 
 				# End process
 				return
-			
+
 			elif self.dialogue_phrase == 'bad_entry':
 				print("CHECK: bad_entry")
 				# Set back to utterances, don't iterate, and retry
@@ -386,7 +386,7 @@ class DialogueManager:
 		return
 
 	## Speech Synthesis Methods
-	
+
 	# Selects utterance to use
 	def speak(self):
 
@@ -411,4 +411,3 @@ class DialogueManager:
 
 		# Return system utterance to front-end
 		return(self.current_system_utterance)
-	

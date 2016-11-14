@@ -96,7 +96,15 @@
                      <span>Options</span>
                   </button>
                   <ul class="dropdown-menu" role="menu">
-                     <li><a href="#"><span class="glyphicon glyphicon-unchecked" id="toggle_sound"></span>&nbsp;Toggle Sound</a></li>
+                     <li id="toggle_sound">
+                        <a href="#">
+                           <h5>
+                              <span class="glyphicon glyphicon-unchecked" id="toggle_sound_glyphicon"></span>
+                              &nbsp;Speech Synthesis&nbsp;
+                              <span class="glyphicon glyphicon-volume-off" id="audio_glyph"></span>
+                           </h5>
+                        </a>
+                     </li>
                   </ul>
                </div>
             </div>
@@ -104,15 +112,23 @@
 
             <div class="panel-body chat-box-main" id = "add-messages">
 
-               <div class="chatEntry row">
+               <!-- <div class="chatEntry row">
                   <div class="col-xs-1 col-xs-offset-1">
                      <img src="../static/media/user.gif" class="img-rounded-sq interviewer-pic" />
                      <h5>Interviewer</h5>
                   </div>
                   <div class="col-xs-9" >
-                     <div class="chat-bubble"><i>System: Press 'Enter' to start the demo.</i></div>
+                     <div class="chat-bubble">
+                        <p>Welcome to the Preliminator.</p>
+                        <p>You may interact with the system by typing
+                           your responses, or by clicking the microphone icon and speaking.</p>
+                        <p>
+                           You can toggle speech synthesis on or off through the <strong>options</strong>
+                           dropdown above.
+                        </p>
+                     </div>
                   </div>
-               </div>
+               </div> -->
 
             </div>
 
@@ -129,12 +145,6 @@
                </div>
 
             </div>
-
-            <div>
-            <span >
-                     <a href = "/feedback_page"><button class="btn btn-info" href="/feedback_page" type="button" >Feedback Page</button></a>
-                  </span>
-         </div>
          </div>
 
 

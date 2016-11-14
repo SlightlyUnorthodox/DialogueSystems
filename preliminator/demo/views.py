@@ -20,7 +20,7 @@ import dialogue as dm
 import random
 import time
 import dialogue
-import threading 
+import threading
 
 #import necessary models and forms
 from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
@@ -309,16 +309,16 @@ def process_ajax(request):
 	dm.process_speech(input = user_utterance)
 
 	# Arbitrary delay to simulate processing.
-	time.sleep(0.5) 
+	time.sleep(0.5)
 
 	# If state is 'closing' stop sending system utterance
 	if (dm.dialogue_state == dm.end_state):
 		# Use utterance to indicate button to click
-		system_utterance = "The Preliminator Demo is now over. Please click on the 'See Feedback' button below."
-		
+		system_utterance = "Thank you for using The Preliminator. This demo is now over. Please click <a href=\"/feedback_page\">here</a> to complete a brief survey."
+
 	else:
 		# Set system utterance
 		system_utterance = dm.speak()
-		
-	# Render utterance to screen	
+
+	# Render utterance to screen
 	return HttpResponse(system_utterance)
