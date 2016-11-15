@@ -24,11 +24,18 @@ setTimeout(function(){
 
          setTimeout(function(){
             add_chat_entry(
-               'To begin, send a response saying "ready"',
+               "To end the demo at any time, please speak or enter 'quit'. Thank you.",
                {'source':'system'}
-            );
-         },3500);
+         );
+            setTimeout(function(){
+               add_chat_entry(
+                  'To begin, send a response saying "ready"',
+                  {'source':'system'}
+               );
+            },3500);
 
+         },3500);
+         
       },3500);
 
    },1500);
