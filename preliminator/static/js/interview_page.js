@@ -1,5 +1,6 @@
 const DIALOG_SYS_API = '/process_ajax';   //TO-DO: use ACTUAL dialog system API
-var TOGGLE_SPEECH_SYNTHESIS = false;
+var TOGGLE_SPEECH_SYNTHESIS = true;
+var RUN_TIMEOUT_TEXT = true;
 
 /* Initial chat instructions */
 setTimeout(function(){
@@ -8,12 +9,18 @@ setTimeout(function(){
       {'source':'system'}
    );
 
+   if(RUN_TIMEOUT_TEXT == false) 
+         return;
+
    setTimeout(function(){
       add_chat_entry(
          'You may interact with the system by typing your responses,' +
          'or by clicking the microphone icon and speaking',
          {'source':'system'}
       );
+
+      if(RUN_TIMEOUT_TEXT == false) 
+         return;
 
       setTimeout(function(){
          add_chat_entry(
@@ -22,11 +29,18 @@ setTimeout(function(){
             {'source':'system'}
          );
 
+         if(RUN_TIMEOUT_TEXT == false) 
+            return;
+
          setTimeout(function(){
             add_chat_entry(
                "To end the demo at any time, please speak or enter 'quit'. Thank you.",
                {'source':'system'}
          );
+
+            if(RUN_TIMEOUT_TEXT == false) 
+               return;
+
             setTimeout(function(){
                add_chat_entry(
                   'To begin, send a response saying "ready"',
@@ -35,7 +49,7 @@ setTimeout(function(){
             },3500);
 
          },3500);
-         
+
       },3500);
 
    },1500);
@@ -80,6 +94,9 @@ toggle_sound.addEventListener('click',function(){
 
 /* Define what happens when the user submits their input */
 function handle_submit(){
+   /* Stop timeout text */
+   RUN_TIMEOUT_TEXT = false;
+
    var inputText = document.getElementById('user_input_box').value;
    add_chat_entry(inputText, {'source':'user'});
    focus_on_latest_msg();
