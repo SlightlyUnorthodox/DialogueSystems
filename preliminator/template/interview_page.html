@@ -6,6 +6,8 @@
 
    <title>The Preliminator</title>
 
+   <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
+
    <!-- Latest compiled and minified Bootstrap CSS -->
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -17,6 +19,35 @@
 
 
 <body>
+
+  <!-- Static navbar -->
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">The Preliminator</a>
+      </div>
+
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="/index.html">Home</a></li>
+          <li><a href="#">Sign In</a></li>
+          <li><a href="/candidate_form.html">Demo</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">Configuration<span class="sr-only">(current)</span></a></li>
+          <li><a href="/about_team.html">About the Team</a></li>
+          <li><a href="#">About the Preliminator</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div><!--/.container-fluid -->
+  </nav>
+
 <style>
 @import url('https://fonts.googleapis.com/css?family=Josefin+Sans:100,300,400,600,700|Titillium+Web:200,300,400,600,700');
 .chat-box-head {
@@ -24,19 +55,21 @@
    font-size: 32pt;
    font-weight: 200;
    padding: 10px 15px;
-   border-bottom: 2px solid #A12EB3;
-   background-color: #B25AE5;
-   color: #fff;
+   border-top-right-radius: 5px;
+   border-top-left-radius: 5px;
+   background-color: #d5d5d5;
+   color: black;
    text-align: center;
 
 }
 .chat-box-main {
    height:80%;
    overflow:auto;
+   background-color: #eee;
 }
 .chat-box-div {
-   border:1px solid #A12EB3;
-   border-bottom:2px solid #A12EB3;
+   border-bottom:2px solid black;
+   border-radius: 5px;
 }
 .chat-bubble {
    min-height: 90px;
@@ -81,30 +114,31 @@
    width: 30px;
    height: 30px;
 }
+
+.rounded{
+  border-radius: 10px;
+}
+
+.specific-rounded{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
 </style>
 
 
-<div class="container">
-   <div class="row pad-top pad-bottom">
+<div class="container rounded">
+   <div class="row pad-top pad-bottom rounded">
       <div class="col-sm-10 col-sm-offset-1">
          <div class="chat-box-div">
             <div class="chat-box-head">
                The Preliminator
                <div class="btn-group pull-right">
-                  <button type="button" class="btn btn-info" data-toggle="dropdown" aria-expanded="false">
+                  <button type="button" class="btn btn-info spe" data-toggle="dropdown" aria-expanded="false">
                      <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                      <span>Options</span>
                   </button>
                   <ul class="dropdown-menu" role="menu">
-                     <li id="toggle_sound">
-                        <a href="#">
-                           <h5>
-                              <span class="glyphicon glyphicon-unchecked" id="toggle_sound_glyphicon"></span>
-                              &nbsp;Speech Synthesis&nbsp;
-                              <span class="glyphicon glyphicon-volume-off" id="audio_glyph"></span>
-                           </h5>
-                        </a>
-                     </li>
+                     <li><a href="#"><span class="glyphicon glyphicon-unchecked" id="toggle_sound"></span>&nbsp;Toggle Sound</a></li>
                   </ul>
                </div>
             </div>
@@ -112,23 +146,15 @@
 
             <div class="panel-body chat-box-main" id = "add-messages">
 
-               <!-- <div class="chatEntry row">
+               <div class="chatEntry row">
                   <div class="col-xs-1 col-xs-offset-1">
                      <img src="../static/media/user.gif" class="img-rounded-sq interviewer-pic" />
                      <h5>Interviewer</h5>
                   </div>
                   <div class="col-xs-9" >
-                     <div class="chat-bubble">
-                        <p>Welcome to the Preliminator.</p>
-                        <p>You may interact with the system by typing
-                           your responses, or by clicking the microphone icon and speaking.</p>
-                        <p>
-                           You can toggle speech synthesis on or off through the <strong>options</strong>
-                           dropdown above.
-                        </p>
-                     </div>
+                     <div class="chat-bubble"><i>System: Press 'Enter' to start the demo.</i></div>
                   </div>
-               </div> -->
+               </div>
 
             </div>
 
@@ -145,6 +171,15 @@
                </div>
 
             </div>
+
+            <div>
+              <hr>
+              <h3> Give us your feedback! </h3>
+              <h5> After you have finished talking with Preliminator, click on the button below to provide feedback on your experience </h5>
+            <span >
+                     <a href = "/feedback_page"><button class="btn btn-info" href="/feedback_page" type="button" >Feedback Page</button></a>
+                  </span>
+         </div>
          </div>
 
 
