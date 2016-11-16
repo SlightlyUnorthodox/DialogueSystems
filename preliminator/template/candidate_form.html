@@ -39,8 +39,14 @@
   </head>
 
   <body>
+    <style>
+      @import url('https://fonts.googleapis.com/css?family=Josefin+Sans:100,300,400,600,700|Titillium+Web:200,300,400,600,700');
+      .new-font{
+         font-family: "Titillium Web";
+      }
+    </style>
     <!-- Static navbar -->
-      <nav class="navbar navbar-default">
+      <nav class="navbar navbar-default new-font">
         <div class="container-fluid">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -67,12 +73,12 @@
         </div><!--/.container-fluid -->
       </nav>
 
-      <div class="container">
+      <div class="container new-font">
         <div class="jumbotron">
           <h1>Welcome, Candidate</h1>
         </div>
       </div>
-    <div class="container">
+    <div class="container new-font">
       {{ state }}
       <form action="/candidate_form/" method="post" class="form form--login"/>{% csrf_token %}
       {% if next %}
@@ -92,7 +98,7 @@
         <label class="fontawesome-lock" for="application__lastName"><span class="hidden">Last Name</span></label>
         {{ form.lastName }}
       </div>
-      
+
       <div class="form__field">
         {{ form.highestEducation.errors }}
         {{ form.highestEducation.label_tag }}
