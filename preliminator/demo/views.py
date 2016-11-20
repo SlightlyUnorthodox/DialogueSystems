@@ -29,8 +29,10 @@ from .forms import CandidateForm, PreSurveyForm, PostSurveyForm
 # Prevent testing errors by setting defaults
 global interview_id
 global candidate_id
+global interview_line
 interview_id = 1
 candidate_id = 1
+interview_line = 0
 
 
 def index(request):
@@ -305,6 +307,20 @@ def process_ajax(request):
 	else:
 		return HttpResponse('Bad Request')
 
+	# Identify current transcript line
+	global interview_line
+
+	# Record use utterance in transcript model
+	newUserLine = Transcript(
+		interview = Interview.objects.get(interview_id = int(interview_id)),
+		speaker = 'C',
+		line_number = interview_line,
+		line_contents = user_utterance)
+	newUserLine.save()
+	
+	# Increment transcript line
+	interview_line += 1
+
 	# Process user utterance
 	dm.process_speech(input = user_utterance)
 
@@ -319,6 +335,17 @@ def process_ajax(request):
 	else:
 		# Set system utterance
 		system_utterance = dm.speak()
+
+	# Record system utterance in transcript model
+	newSystemLine = Transcript(
+		interview = Interview.objects.get(interview_id = int(interview_id)),
+		speaker = 'R',
+		line_number= interview_line,
+		line_contents = system_utterance)
+	newSystemLine.save()
+
+	# Increment transcript line
+	interview_line += 1
 
 	# Render utterance to screen
 	return HttpResponse(system_utterance)
