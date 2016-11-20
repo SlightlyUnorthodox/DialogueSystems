@@ -5,60 +5,10 @@ var RUN_TIMEOUT_TEXT = true;
 /* Initial chat instructions */
 setTimeout(function(){
    add_chat_entry(
-      'Welcome to the Preliminator',
+      'Welcome to the Preliminator. To begin, write or say, "ready".',
       {'source':'system'}
    );
-
-   if(RUN_TIMEOUT_TEXT == false) 
-         return;
-
-   setTimeout(function(){
-      add_chat_entry(
-         'You may interact with the system by typing your responses,' +
-         'or by clicking the microphone icon and speaking',
-         {'source':'system'}
-      );
-
-      if(RUN_TIMEOUT_TEXT == false) 
-         return;
-
-      setTimeout(function(){
-         add_chat_entry(
-            'You can toggle speech synthesis on or off through the ' +
-            '<i>options</i> dropdown above.',
-            {'source':'system'}
-         );
-
-         if(RUN_TIMEOUT_TEXT == false) 
-            return;
-
-         setTimeout(function(){
-            add_chat_entry(
-               "To end the demo at any time, please speak or enter 'quit'. Thank you.",
-               {'source':'system'}
-         );
-
-            if(RUN_TIMEOUT_TEXT == false) 
-               return;
-
-            setTimeout(function(){
-               add_chat_entry(
-                  'To begin, send a response saying "ready"',
-                  {'source':'system'}
-               );
-            },3500);
-
-         },3500);
-
-      },3500);
-
-   },1500);
-
 },250);
-
-
-
-
 
 /* When the submit button is clicked, handle_submit() */
 var submit_btn = document.getElementById('submit_btn');
