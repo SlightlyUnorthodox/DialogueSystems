@@ -8,8 +8,8 @@ import re
 from .models import Candidate, Interview, User, Recruiter, PreSurvey, PostSurvey, Transcript, Feedback
 
 # TODO: Expand as more patterns are identified
-affirmative_patterns = re.compile("(yes)|(mhm)|(uhuh)|(okay)")
-negative_patterns = re.compile("(no)")
+affirmative_patterns = re.compile("(yes)|(mhm)|(uhuh)|(okay)|(ok)|(yeah)|(yea)|(okey-dokey)|(affirmative)|(roger)|(aye)|(yup)|(very well)|(sure)|(okie dokie)")
+negative_patterns = re.compile("(no)|(nope)|(nay)|(nah)|(not)")
 any_pattern = re.compile(".?")
 likert_patterns_one =  re.compile("(one)|1")
 likert_patterns_two =  re.compile("(two)|2")
