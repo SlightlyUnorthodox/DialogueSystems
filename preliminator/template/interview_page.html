@@ -130,6 +130,13 @@
    .sidebar-heading{
         font-size: 27px;
    }
+
+   .clickable{
+      cursor:pointer;
+   }
+   #toggle_synth:hover{
+
+   }
    </style>
 
 
@@ -139,7 +146,10 @@
                <div class="chat-box-head new-font">
                   The Preliminator
                   <div class="btn-group pull-right">
-                     <button type="button" class="btn btn-info spe" data-toggle="dropdown" aria-expanded="false">
+
+                     <span class="clickable glyphicon glyphicon-volume-up" id="toggle_synth" title="Click to toggle speech synthesis"></span>
+
+                     <!-- <button type="button" class="btn btn-info spe" data-toggle="dropdown" aria-expanded="false">
                         <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
                         <span>Options</span>
                      </button>
@@ -153,7 +163,8 @@
                               </h5>
                            </a>
                         </li>
-                     </ul>
+                     </ul> -->
+
                   </div>
                </div>
 
@@ -168,14 +179,10 @@
                      <span class="input-group-btn">
                         <button class="btn btn-info" id="submit_btn" type="button" >Enter</button>
                      </span>
-                     <a class="mic_btn" href="#" id="mic_btn">
-                        <img src="../static/media/mic.ico" class="mic_icon">
-                     </a>
                   </div>
                </div>
 
             </div>
-            <hr>
          </div>
       </div>
       <div class="col-sm-2 container" style = "margin-left: 30px">

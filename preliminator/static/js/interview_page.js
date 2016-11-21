@@ -1,121 +1,105 @@
 const DIALOG_SYS_API = '/process_ajax';   //TO-DO: use ACTUAL dialog system API
-var TOGGLE_SPEECH_SYNTHESIS = true;
-var RUN_TIMEOUT_TEXT = true;
+var SYNTHESIZE_RESPONSES = true;
+var PAUSE_RECOGNITION = false;
+
+window.onload = function(){
+   do_initial_messages();       /* Handle initial chat messages */
+   setup_speech_recognition();  /* Enable speech recognition */
+   setup_synth_toggle();        /* Set up the toggle-able speech synthesis */
+   add_submit_listeners();      /* Add listeners for input submission box  */
+};
 
 /* Initial chat instructions */
-setTimeout(function(){
-   add_chat_entry(
-      'Welcome to the Preliminator',
-      {'source':'system'}
-   );
-
-   if(RUN_TIMEOUT_TEXT == false) 
-         return;
-
+function do_initial_messages(){
    setTimeout(function(){
       add_chat_entry(
-         'You may interact with the system by typing your responses,' +
-         'or by clicking the microphone icon and speaking',
+         'Welcome to the Preliminator.',
          {'source':'system'}
       );
+   },250);
+}
 
-      if(RUN_TIMEOUT_TEXT == false) 
-         return;
+/* Sets up continuous speech recognition. */
+function setup_speech_recognition(){
+   var microphone = new webkitSpeechRecognition();
+   microphone.lang = 'en-US';
+   microphone.continuous = true;
+   microphone.lang = 'en-US';
+   microphone.interimResults = false;
+   microphone.maxAlternatives = 1;
 
-      setTimeout(function(){
-         add_chat_entry(
-            'You can toggle speech synthesis on or off through the ' +
-            '<i>options</i> dropdown above.',
-            {'source':'system'}
-         );
+   microphone.onend = function(){
+      /* Restart the listener on stop, unless it's being suppressed right now */
+      if(!PAUSE_RECOGNITION)
+         microphone.start();
+   };
 
-         if(RUN_TIMEOUT_TEXT == false) 
-            return;
+   microphone.onresult = function(event){
+      var results = event.results[event.results.length -1][0].transcript;
+      var confidence = event.results[event.results.length -1][0].confidence;
 
-         setTimeout(function(){
-            add_chat_entry(
-               "To end the demo at any time, please speak or enter 'quit'. Thank you.",
-               {'source':'system'}
-         );
+      console.log(event.results);
 
-            if(RUN_TIMEOUT_TEXT == false) 
-               return;
+      console.log('Results:\t' + results);
+      console.log('Confidence:\t' + confidence);
 
-            setTimeout(function(){
-               add_chat_entry(
-                  'To begin, send a response saying "ready"',
-                  {'source':'system'}
-               );
-            },3500);
-
-         },3500);
-
-      },3500);
-
-   },1500);
-
-},250);
-
-
-
-
-
-/* When the submit button is clicked, handle_submit() */
-var submit_btn = document.getElementById('submit_btn');
-submit_btn.addEventListener('click',handle_submit);
-
-/* When the enter key is pressed when typing into input, handle_submit() */
-var input_box = document.getElementById('user_input_box');
-input_box.addEventListener('keyup',function(event){
-   event.preventDefault();
-   if (event.keyCode == 13) handle_submit();
-});
-
-/* Open connection for speach API when mic button hit */
-var mic_btn = document.getElementById('mic_btn');
-mic_btn.addEventListener('click',function(){
-   var recognition = new webkitSpeechRecognition();
-   recognition.onresult = function(event) {
-      document.getElementById('user_input_box').value = event.results[0][0].transcript;
-      handle_submit();
-      document.getElementById('user_input_box').placeholder = "Type your response, or click the microphone to speak";
+      handle_submit(results);
    }
-   recognition.start();
-   document.getElementById('user_input_box').placeholder = "Listening...";
-});
 
-var toggle_sound = document.getElementById('toggle_sound');
-toggle_sound.addEventListener('click',function(){
-   TOGGLE_SPEECH_SYNTHESIS = !TOGGLE_SPEECH_SYNTHESIS;
-   document.getElementById('toggle_sound_glyphicon').className = (TOGGLE_SPEECH_SYNTHESIS)? "glyphicon glyphicon-check" : "glyphicon glyphicon-unchecked";
-   document.getElementById('audio_glyph').className = (TOGGLE_SPEECH_SYNTHESIS)? "glyphicon glyphicon-volume-up" : "glyphicon glyphicon-volume-off";
+   microphone.start();
+}
 
-});
+/* Sets up the toggle-able speech synthesis icon and behavior */
+function setup_synth_toggle(){
+   var toggle_sound = document.getElementById('toggle_synth');
+   toggle_sound.addEventListener('click',function(){
+      SYNTHESIZE_RESPONSES = !SYNTHESIZE_RESPONSES;   /* Flip the boolean */
+      if(SYNTHESIZE_RESPONSES){
+         console.log('Synth on');
+         document.getElementById('toggle_synth').className = "clickable glyphicon glyphicon-volume-up";
+      } else {
+         console.log('Synth off');
+
+         document.getElementById('toggle_synth').className = "clickable glyphicon glyphicon-volume-off";
+         window.speechSynthesis.cancel();
+      }
+   });
+}
+
+/* Add listeners to check for "submit" through button click OR pressing ENTER */
+function add_submit_listeners(){
+   /* Add a listener so that when the submit button is clicked, handle_submit() */
+   var submit_btn = document.getElementById('submit_btn');
+   submit_btn.addEventListener('click',function(){
+      var inputText = document.getElementById('user_input_box').value;
+      handle_submit(inputText);
+   });
+
+   /* Alternative to pressing submit button: Press enter */
+   var input_box = document.getElementById('user_input_box');
+   input_box.addEventListener('keyup',function(event){
+      event.preventDefault();
+      if (event.keyCode == 13) {
+         var inputText = document.getElementById('user_input_box').value;
+         handle_submit(inputText);
+      }
+   });
+}
 
 /* Define what happens when the user submits their input */
-function handle_submit(){
-   /* Stop timeout text */
-   RUN_TIMEOUT_TEXT = false;
-
-   var inputText = document.getElementById('user_input_box').value;
+function handle_submit(inputText){
    add_chat_entry(inputText, {'source':'user'});
    focus_on_latest_msg();
+
+   /* Send the inputText, and set up handle_response as the callback handler */
    send_input_to_dialog(inputText, handle_response);
 }
 
-/* Define what happens when a response is received */
-function handle_response(response){
-   add_chat_entry(response, {'source':'system'});
-   focus_on_latest_msg();
-}
-
-function send_input_to_dialog(inputText, callback){
+/* Sends user inputs to the dialog system through AJAX. Also takes a callback
+   function to handle what to do with the response text.  */
+function send_input_to_dialog(inputText, response_handling_callback){
    function reqListener () {
-      callback(this.responseText);
-      if(TOGGLE_SPEECH_SYNTHESIS){
-         var msg = new SpeechSynthesisUtterance(this.responseText);
-         window.speechSynthesis.speak(msg);
-      }
+      response_handling_callback(this.responseText);
    }
 
    var xhr = new XMLHttpRequest();
@@ -124,7 +108,15 @@ function send_input_to_dialog(inputText, callback){
    xhr.addEventListener("load", reqListener);
    xhr.open('POST',DIALOG_SYS_API);
    xhr.send(fd);
+}
 
+/* Define what happens when a response is received */
+function handle_response(response){
+   add_chat_entry(response, {'source':'system'});
+   focus_on_latest_msg();
+   if(SYNTHESIZE_RESPONSES){
+      say(response);
+   }
 }
 
 /* Scroll down to make latest chatEntry visible */
@@ -184,4 +176,19 @@ function add_chat_entry(inputString, params){
 
    // reset the message box
    var inputTag = document.getElementById('user_input_box').value = "";
+}
+
+/* Speaks the given message, making sure to pause speech recognition while it does so. */
+function say(message){
+   PAUSE_RECOGNITION = true;  //Pauses speech recognition
+   console.log('Listening paused');
+
+   var utterance = new SpeechSynthesisUtterance(message);   //Creates an utterance to speak
+   window.speechSynthesis.speak(utterance);                 //Begins speaking said utterance
+
+   /* When done speaking, restore speech recognition. */
+   utterance.addEventListener('end',function(){
+      PAUSE_RECOGNITION = false;
+      console.log('Listening restored');
+   });
 }
