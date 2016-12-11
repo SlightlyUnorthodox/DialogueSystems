@@ -150,6 +150,25 @@ class DialogueManager:
 				'bad_entry':["Please enter a value from '1' to '5' or 'one' to 'five'."]},
 		)
 
+		# Behavioral pairs
+		self.behavioral_acts = (
+			{
+				'utterances': [str(self.resume_set['first_name'][1]) + ", could you tell me what you enjoy the most about " + str(self.resume_set['program'][1]) + "?",
+				"Why, " + str(self.resume_set['first_name'][1]) + ", are you interested in " +  str(self.resume_set['program'][1]) +  "?"],
+				'patterns':{
+					"any": any_pattern,
+				},
+				'grounding':["No grounding phrase needed."],
+				'bad_entry':["No bad entry"]},
+			{
+				'utterances': ["What do you think is you greatest strength?",
+				"What do you think is your biggest weakness?"],
+				'patterns':{
+					"any": any_pattern,
+				},
+				'grounding':["No grounding phrase needed."],
+				'bad_entry':["No bad entry"]},
+		)
 
 		# Eligibility pairs
 		self.eligibility_acts = (
@@ -207,6 +226,7 @@ class DialogueManager:
 			('greeting', [0, self.greeting_acts]), # 0 - incomplete, 1 - complete
 			('resume', [0, self.resume_acts]),
 			('job', [0, self.job_acts]),
+			('behavioral', [0, self.behavioral_acts]),
 			('eligibility', [0, self.eligibility_acts]),
 			('closing', [0, self.closing_acts]),
 		])
@@ -314,7 +334,7 @@ class DialogueManager:
 		print("Dialogue State: " + str(self.dialogue_state) + "\n")
 
 		# Only run processing on select states
-		if self.dialogue_state in ('resume', 'job'): # ('resume', 'job', 'eligibility')
+		if self.dialogue_state in ('resume', 'job', 'behavioral'): # ('resume', 'job', 'eligibility')
 
 			# Check if user input makes sense
 			if self.dialogue_phrase == 'utterances': # and self.validation == True:
@@ -347,7 +367,7 @@ class DialogueManager:
 						self.cycle_timeout = 0
 						self.dialogue_phrase = 'utterances'
 						self.check_state()
-						
+
 						# End process
 						return
 
