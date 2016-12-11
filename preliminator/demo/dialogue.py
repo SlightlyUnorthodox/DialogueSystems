@@ -342,9 +342,12 @@ class DialogueManager:
 							self.user_response_value = key
 						#self.bad_entry = False
 
-						self.dialogue_phrase = 'utterances'
+						# Iterate dialogue state
 						self.proceed = True
-
+						self.cycle_timeout = 0
+						self.dialogue_phrase = 'utterances'
+						self.check_state()
+						
 						# End process
 						return
 
