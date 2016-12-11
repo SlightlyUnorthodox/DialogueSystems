@@ -38,7 +38,14 @@ class DialogueManager:
 		self.dialogue_state_act = 0 # Indicates index of
 		self.dialogue_state_utterance = 0
 		self.dialogue_phrase = 'utterances'
+
+		self.previous_dialogue_state = self.dialogue_state
+		self.previous_dialogue_state_act = self.dialogue_state_act
+		self.previous_dialogue_state_utterance = self.dialogue_state_utterance
+
+		# Misc. Dialogue State Information
 		self.grounding_active = 0 # If 1, indicates grounding state should be evaluated before continuing
+		self.grounding_type = 'implicit' # Either 'implicit' or 'explicit', should be 'implicit' unless good reason
 		self.end_state = 'closing'
 		self.initiative = 'system'
 		self.current_speaker = 'system'
@@ -143,6 +150,25 @@ class DialogueManager:
 				'bad_entry':["Please enter a value from '1' to '5' or 'one' to 'five'."]},
 		)
 
+		# Behavioral pairs
+		self.behavioral_acts = (
+			{
+				'utterances': [str(self.resume_set['first_name'][1]) + ", could you tell me what you enjoy the most about " + str(self.resume_set['program'][1]) + "?",
+				"Why, " + str(self.resume_set['first_name'][1]) + ", are you interested in " +  str(self.resume_set['program'][1]) +  "?"],
+				'patterns':{
+					"any": any_pattern,
+				},
+				'grounding':["No grounding phrase needed."],
+				'bad_entry':["No bad entry"]},
+			{
+				'utterances': ["What do you think is you greatest strength?",
+				"What do you think is your biggest weakness?"],
+				'patterns':{
+					"any": any_pattern,
+				},
+				'grounding':["No grounding phrase needed."],
+				'bad_entry':["No bad entry"]},
+		)
 
 		# Eligibility pairs
 		self.eligibility_acts = (
@@ -200,6 +226,7 @@ class DialogueManager:
 			('greeting', [0, self.greeting_acts]), # 0 - incomplete, 1 - complete
 			('resume', [0, self.resume_acts]),
 			('job', [0, self.job_acts]),
+			('behavioral', [0, self.behavioral_acts]),
 			('eligibility', [0, self.eligibility_acts]),
 			('closing', [0, self.closing_acts]),
 		])
@@ -229,28 +256,40 @@ class DialogueManager:
 				self.resume_set[key] = [1, getattr(self.candidate, key)]
 				self.resume_set[key][0] = 1
 
-	def check_state(self):
+	def check_state(self, back = False):
 
-		# Check to see if current state has remaining utterances ## TODO: make more sophisticated
-		if ((self.dialogue_state_act + 1) >= len(self.state_set[self.dialogue_state][1])):
-			# If no more utterances, mark state complete
-			self.state_set[self.dialogue_state][0] = 1
-			self.dialogue_state_act = 0
+		# Revert state if 'back' command used
+		if back == True:
+			self.dialogue_state = self.previous_dialogue_state
+			self.dialogue_state_act = self.previous_dialogue_state_act
+			self.dialogue_state_utterance = self.previous_dialogue_state_utterance
 		else:
-			# Otherwise, increment current utterance
-			self.dialogue_state_act += 1
+			# Don't revert state
+			# Set back state variables for future use
+			self.previous_dialogue_state = self.dialogue_state
+			self.previous_dialogue_state_act = self.dialogue_state_act
+			self.previous_dialogue_state_utterance = self.dialogue_state_utterance
+		
+			# Check to see if current state has remaining utterances ## TODO: make more sophisticated
+			if ((self.dialogue_state_act + 1) >= len(self.state_set[self.dialogue_state][1])):
+				# If no more utterances, mark state complete
+				self.state_set[self.dialogue_state][0] = 1
+				self.dialogue_state_act = 0
+			else:
+				# Otherwise, increment current utterance
+				self.dialogue_state_act += 1
 
-		# Assign current state as first zero-completion state
-		for key in self.state_set:
+			# Assign current state as first zero-completion state
+			for key in self.state_set:
 
-			if (self.state_set[key][0] == 0):
-				self.dialogue_state = key
-				self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'])))
-				print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
-				return
+				if (self.state_set[key][0] == 0):
+					self.dialogue_state = key
+					self.dialogue_state_utterance = random.choice(range(0, len(self.state_set[self.dialogue_state][1][self.dialogue_state_act]['utterances'])))
+					print("Current key: " + str(self.dialogue_state) + "\tCurrent utterance index: " + str(self.dialogue_state_utterance) + "\n")
+					return
 
-		# If all states complete, default to closing
-		self.dialogue_state = 'closing'
+			# If all states complete, default to closing
+			self.dialogue_state = 'closing'
 
 	## Automatic Speech Recognition (ASR) Methods
 
@@ -270,31 +309,32 @@ class DialogueManager:
 			self.dialogue_state = 'closing'
 			return
 
-		# Catch 'back' instance
-		# if self.current_user_utterance.find("back") > 0:
-		# 	self.dialogue_state
-
-		# Prevent death spirals
-		if self.cycle_timeout >= 2:
+		# Handle exceptional states
+		if self.current_user_utterance.find("back") >= 0:
+			# Catch 'back' instance
+		 	self.check_state(back = True)
+		 	return
+		elif self.current_user_utterance.find('open the pod bay doors') >= 0:
+			# Add 2001 Space Odyssey easter egg
+			# 	Skips all speech processing/check state for this iteration
+			return
+		elif self.cycle_timeout >= 2:
+			# Prevent death spirals
 			self.dialogue_phrase = 'utterances'
 			self.cycle_timeout = 0
 			self.proceed = True
 			self.check_state()
 			return
 		elif self.dialogue_phrase == 'bad_entry':
+			# Catch bad entry
 			self.dialogue_phrase = 'utterances'
-
-		# # Open the pod bay doors
-		# if self.current_user_utterance == 'open the pod bay doors'
-		# 	# Design easter egg here
-		# 	return
 
 		print("Received input: " + self.current_user_utterance )
 		print("Dialogue Phrase: " + str(self.dialogue_phrase))
 		print("Dialogue State: " + str(self.dialogue_state) + "\n")
 
 		# Only run processing on select states
-		if self.dialogue_state in ('resume', 'job'): # ('resume', 'job', 'eligibility')
+		if self.dialogue_state in ('resume', 'job', 'behavioral'): # ('resume', 'job', 'eligibility')
 
 			# Check if user input makes sense
 			if self.dialogue_phrase == 'utterances': # and self.validation == True:
@@ -322,8 +362,11 @@ class DialogueManager:
 							self.user_response_value = key
 						#self.bad_entry = False
 
-						self.dialogue_phrase ='grounding'
-						self.proceed = False
+						# Iterate dialogue state
+						self.proceed = True
+						self.cycle_timeout = 0
+						self.dialogue_phrase = 'utterances'
+						self.check_state()
 
 						# End process
 						return
@@ -343,28 +386,28 @@ class DialogueManager:
 			# 	return
 
 			# Otherwise reconcile grounding or bad state
-			elif self.dialogue_phrase == 'grounding':
+			# elif self.dialogue_phrase == 'grounding':
 
-				# Check for affirmative string
-				pattern = affirmative_patterns
-				if re.search(pattern, self.current_user_utterance):
-					match = pattern.findall(self.current_user_utterance)
-					self.user_response_value = str(match[0][0])
+			# 	# Check for affirmative string
+			# 	pattern = affirmative_patterns
+			# 	if re.search(pattern, self.current_user_utterance):
+			# 		match = pattern.findall(self.current_user_utterance)
+			# 		self.user_response_value = str(match[0][0])
 
-					# Iterate dialogue state
-					self.proceed = True
-					self.cycle_timeout = 0
-					self.dialogue_phrase = 'utterances'
-					self.check_state()
-					# End process
-					return
+			# 		# Iterate dialogue state
+			# 		self.proceed = True
+			# 		self.cycle_timeout = 0
+			# 		self.dialogue_phrase = 'utterances'
+			# 		self.check_state()
+			# 		# End process
+			# 		return
 
-				self.dialogue_phrase = 'utterances'
-				self.cycle_timeout += 1
-				self.proceed = False
+			# 	self.dialogue_phrase = 'utterances'
+			# 	self.cycle_timeout += 1
+			# 	self.proceed = False
 
-				# End process
-				return
+			# 	# End process
+			# 	return
 
 			elif self.dialogue_phrase == 'bad_entry':
 				print("CHECK: bad_entry")
@@ -397,15 +440,20 @@ class DialogueManager:
 		print("System: dialogue_state_act=" + str(self.dialogue_state_act))
 		print("System: dialogue_phrase=" + str(self.dialogue_phrase))
 
+		# Confirm 2001 Space Odyssey easter egg
+		if self.current_user_utterance.find('open the pod bay doors') >= 0:
+			self.current_system_utterance = "I'm sorry " + str(self.resume_set['first_name'][1]) + ", I'm afraid I can't do that."
+		else:
+			# Update current system utterance
+			self.current_system_utterance = random.choice(self.state_set[self.dialogue_state][1][self.dialogue_state_act][self.dialogue_phrase]) # [self.dialogue_state_utterance]
+
+			if self.dialogue_phrase == 'grounding':
+				# Use explicit grounding
+				self.current_system_utterance = self.current_system_utterance + str(self.current_user_utterance) + "?"
+	
 		# Update dialogue acts
 		#self.__update_dialogue_acts()
-
-		# Update current system utterance
-		self.current_system_utterance = random.choice(self.state_set[self.dialogue_state][1][self.dialogue_state_act][self.dialogue_phrase]) # [self.dialogue_state_utterance]
-
-		if self.dialogue_phrase == 'grounding':
-			self.current_system_utterance = self.current_system_utterance + str(self.current_user_utterance) + "?"
-
+		
 		# Log system utterance
 		print("System: " + str(self.current_system_utterance))
 
