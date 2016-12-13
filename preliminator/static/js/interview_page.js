@@ -2,7 +2,6 @@ const DIALOG_SYS_API = '/process_ajax';   //TO-DO: use ACTUAL dialog system API
 var SYNTHESIZE_RESPONSES = true;
 var PAUSE_RECOGNITION = false;
 
-<<<<<<< HEAD
 window.onload = function(){
    do_initial_messages();       /* Handle initial chat messages */
    setup_speech_recognition();  /* Enable speech recognition */
