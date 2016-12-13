@@ -13,7 +13,7 @@ window.onload = function(){
 function do_initial_messages(){
    setTimeout(function(){
       add_chat_entry(
-         'Welcome to the Preliminator.',
+         "Welcome to the Preliminator, please click 'enter' or speak in to the mic to begin.",
          {'source':'system'}
       );
    },250);
@@ -153,7 +153,7 @@ function add_chat_entry(inputString, params){
    pic.className = (params.source === "system")? "img-rounded-sq interviewer-pic":"img-rounded-sq interviewee-pic";
    pic_name_div.appendChild(pic);
    var nametag = document.createElement('h5');
-   nametag.innerHTML = (params.source === "user")? "You" : "Interviewer";
+   nametag.innerHTML = (params.source === "user")? "You" : "Preliminator";
    pic_name_div.appendChild(nametag);
    meta_chat_div.appendChild(pic_name_div);
 
