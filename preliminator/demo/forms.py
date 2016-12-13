@@ -37,7 +37,7 @@ class CandidateForm(forms.Form):
 	educationStatus = forms.ChoiceField(choices = EDU_STATUS, label = 'Education Status', required = True, initial =  'I')
 
 	programField = forms.CharField(label = 'Major/Field', min_length = 1, max_length = 50, required = False)
-	yearsExperience = forms.IntegerField(label = 'Years Experience', min_value = 1, max_value = 20, required = True)
+	yearsExperience = forms.IntegerField(label = 'Years of Experience In Field (Academics Included)', min_value = 1, max_value = 80, required = True)
 	relevantEmployer = forms.CharField(label = 'Relevant Employer', min_length = 1, max_length = 50, required = False)
 	relevantTitle = forms.CharField(label = 'Relevant Job Title', min_length = 1, required = False)
 
