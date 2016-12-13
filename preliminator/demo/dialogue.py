@@ -125,7 +125,7 @@ class DialogueManager:
 		# Job-driven pairs
 		self.job_acts = (
 			{
-				'utterances': ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Git?",
+				'utterances': ["On a scale of 1 to 5, 'one', being no experience and, 'five', expert, what level of experience would you say you have with Git?",
 				"If you had to rate your experience with Git or Github on a scale of 1 (low) to 5 (high), what would you rate it?"],
 				'patterns':{
 				 1: likert_patterns_one,
@@ -137,8 +137,20 @@ class DialogueManager:
 				'grounding':["Did you say: "],
 				'bad_entry':["Please enter a value from '1' to '5'."]},
 			{
-				'utterances': ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Java?",
+				'utterances': ["On a scale of 1 to 5, 'one', being no experience and, 'five', expert, what level of experience would you say you have with Java?",
 				"If you had to rate your experience with Java on a scale of 1 (low) to 5 (high), what would you rate it?"],
+				'patterns':{
+				 1: likert_patterns_one,
+				 2: likert_patterns_two,
+				 3: likert_patterns_three,
+				 4: likert_patterns_four,
+				 5: likert_patterns_five,
+				},
+				'grounding':["Did you say: "],
+				'bad_entry':["Please enter a value from '1' to '5'."]},
+			{
+				'utterances': ["On a scale of 1 to 5, 'one', being no experience and, 'five', expert, what level of experience would you say you have with databases (SQL, MYSQL, etc.)?",
+				"If you had to rate your experience with databases (SQL, MYSQL, etc.) on a scale of 1 (low) to 5 (high), what would you rate it?"],
 				'patterns':{
 				 1: likert_patterns_one,
 				 2: likert_patterns_two,
@@ -161,8 +173,19 @@ class DialogueManager:
 				'grounding':["No grounding phrase needed."],
 				'bad_entry':["No bad entry"]},
 			{
-				'utterances': ["What do you think is you greatest strength?",
-				"What do you think is your biggest weakness?"],
+				'utterances': ["What would you say is your greatest strength?",
+				"What would you say is your biggest weakness?"],
+				'patterns':{
+					"any": any_pattern,
+				},
+				'grounding':["No grounding phrase needed."],
+				'bad_entry':["No bad entry"]},
+			{
+				'utterances': ["Give me a specific example of a time when you used good judgment and logic in solving a problem.",
+				"Give me an example of a time when you set a goal and were able to meet or achieve it.",
+				"Give me an example of a time when you had to make a split-second decision.",
+				"Give me an example of a time when something you tried to accomplish and failed.",
+				"Give me an example of when you showed initiative and took the lead."],
 				'patterns':{
 					"any": any_pattern,
 				},
@@ -180,7 +203,7 @@ class DialogueManager:
 				 "no": negative_patterns,
 				},
 				'grounding':["Did you say: "],
-				'bad_entry':["Please enter a value 'yes' or 'no'."]},
+				'bad_entry':["Please respond either 'yes' or 'no'."]},
 			{
 				'utterances':["Will you at any time require visa-sponsorship to continue working?",
 				"Do you require visa-sponsorship to work in the US?"],
@@ -189,7 +212,7 @@ class DialogueManager:
 				 "no": negative_patterns,
 				},
 				'grounding':["Did you say: "],
-				'bad_entry':["Please enter a value 'yes' or 'no'."]},
+				'bad_entry':["Please respond either 'yes' or 'no'."]},
 			{
 				'utterances':["Have you ever been convicted of a felony?"],
 				'patterns':{
@@ -197,7 +220,7 @@ class DialogueManager:
 				 "no": negative_patterns,
 				},
 				'grounding':["Did you say: "],
-				'bad_entry':["Please enter a value 'yes' or 'no'."]},
+				'bad_entry':["Please respond either 'yes' or 'no'."]},
 			{
 				'utterances':["Do you require any accomodations in order to complete your work?",
 				"Will you need any accomodations to complete the work described?"],
@@ -206,7 +229,7 @@ class DialogueManager:
 				 "no": negative_patterns,
 				},
 				'grounding':["Did you say: "],
-				'bad_entry':["Please enter a value 'yes' or 'no'."]},
+				'bad_entry':["Please respond either 'yes' or 'no'."]},
 		)
 
 		# Closing state pairs
@@ -334,8 +357,15 @@ class DialogueManager:
 		print("Dialogue State: " + str(self.dialogue_state))
 		print("Cycle Timeout Counter: " + str(self.cycle_timeout) + "\n")
 		
+		if self.dialogue_phrase == 'bad_entry':
+			print("CHECK: bad_entry")
+
+			# Set back to utterances, don't iterate, and retry
+			self.dialogue_phrase = 'utterances'
+
+
 		# Only run processing on select states
-		if self.dialogue_state in ('resume', 'job', 'behavioral'): # ('resume', 'job', 'eligibility')
+		if self.dialogue_state in ('resume', 'job', 'behavioral', 'eligibility'): # ('resume', 'job', 'eligibility')
 
 			# Check if user input makes sense
 			if self.dialogue_phrase == 'utterances': # and self.validation == True:
@@ -374,19 +404,11 @@ class DialogueManager:
 
 
 				self.dialogue_phrase = 'bad_entry'
-				self.proceed = False
-				# End process
-				return
-
-			elif self.dialogue_phrase == 'bad_entry':
-				print("CHECK: bad_entry")
-				# Set back to utterances, don't iterate, and retry
-				self.dialogue_phrase == 'utterances'
 				self.cycle_timeout += 1
 				self.proceed = False
-
 				# End process
 				return
+
 			# elif self.dialogue_phrase == 'utterances':
 			# 	# Prepare to check input next round
 			# 	self.validation = True
