@@ -135,7 +135,7 @@ class DialogueManager:
 				 5: likert_patterns_five,
 				},
 				'grounding':["Did you say: "],
-				'bad_entry':["Please enter a value from '1' to '5' or 'one' to 'five'."]},
+				'bad_entry':["Please enter a value from '1' to '5'."]},
 			{
 				'utterances': ["On a scale of 1 to 5, 'one' being no experience and five 'expert', what level of experience would you say you have with Java?",
 				"If you had to rate your experience with Java on a scale of 1 (low) to 5 (high), what would you rate it?"],
@@ -147,7 +147,7 @@ class DialogueManager:
 				 5: likert_patterns_five,
 				},
 				'grounding':["Did you say: "],
-				'bad_entry':["Please enter a value from '1' to '5' or 'one' to 'five'."]},
+				'bad_entry':["Please enter a value from '1' to '5'."]},
 		)
 
 		# Behavioral pairs
@@ -325,14 +325,15 @@ class DialogueManager:
 			self.proceed = True
 			self.check_state()
 			return
-		elif self.dialogue_phrase == 'bad_entry':
-			# Catch bad entry
-			self.dialogue_phrase = 'utterances'
+		# elif self.dialogue_phrase == 'bad_entry':
+		# 	# Catch bad entry
+		# 	self.dialogue_phrase = 'utterances'
 
 		print("Received input: " + self.current_user_utterance )
 		print("Dialogue Phrase: " + str(self.dialogue_phrase))
-		print("Dialogue State: " + str(self.dialogue_state) + "\n")
-
+		print("Dialogue State: " + str(self.dialogue_state))
+		print("Cycle Timeout Counter: " + str(self.cycle_timeout) + "\n")
+		
 		# Only run processing on select states
 		if self.dialogue_state in ('resume', 'job', 'behavioral'): # ('resume', 'job', 'eligibility')
 
@@ -377,6 +378,15 @@ class DialogueManager:
 				# End process
 				return
 
+			elif self.dialogue_phrase == 'bad_entry':
+				print("CHECK: bad_entry")
+				# Set back to utterances, don't iterate, and retry
+				self.dialogue_phrase == 'utterances'
+				self.cycle_timeout += 1
+				self.proceed = False
+
+				# End process
+				return
 			# elif self.dialogue_phrase == 'utterances':
 			# 	# Prepare to check input next round
 			# 	self.validation = True
@@ -409,15 +419,7 @@ class DialogueManager:
 			# 	# End process
 			# 	return
 
-			elif self.dialogue_phrase == 'bad_entry':
-				print("CHECK: bad_entry")
-				# Set back to utterances, don't iterate, and retry
-				self.dialogue_phrase == 'utterances'
-				self.cycle_timeout += 1
-				self.proceed = False
-
-				# End process
-				return
+			
 
 		# Iterate dialogue state
 		self.proceed = True
