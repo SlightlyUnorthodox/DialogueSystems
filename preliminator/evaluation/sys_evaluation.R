@@ -3,6 +3,8 @@
 # Load necessary packages
 library(RJSONIO)
 library(RCurl)
+library(MASS)
+library(leaps)
 
 # Import data from json files
 for(file in c('candidate.json', 'transcript.json', 'presurvey.json', 'postsurvey.json')) {
@@ -61,8 +63,8 @@ postsurvey <- postsurvey[(nrow(postsurvey) - tail.len + 1):nrow(postsurvey),]
 colnames(candidate)[1] <- "interview"
 
 # Survey field names
-names(presurvey) <- c("interview", "interest.level", "satisfaction", "asr.confidence", "ease.of.use", "previous.experience")
-names(postsurvey) <- c("interview", "interest.level", "satisfaction", "asr.confidence", "ease.of.use", "previous.experience")
+names(presurvey) <- c("interview", "pre.interest.level", "pre.satisfaction", "pre.asr.confidence", "pre.ease.of.use", "pre.previous.experience")
+names(postsurvey) <- c("interview", "post.interest.level", "post.satisfaction", "post.asr.confidence", "post.ease.of.use", "post.previous.experience")
 
 # Long form survey names
 presurvey.names.long <- c("I am interested in using dialogue systems to help me with tasks.",
@@ -77,8 +79,6 @@ postsurvey.names.long <- c("This system has sustained or fostered my interest in
                            "This system was easy to use.",
                            "I believe my previous experience helped me use this dialogue system.")
 
-# Set global statistics
-sample.size <- nrow(candidate)
 
 # Build feature set from transcript
 transcript.set <- data.frame(interview = numeric(0), 
@@ -131,12 +131,49 @@ candidate$interview <- 1:nrow(candidate)
 presurvey$interview <- 1:nrow(presurvey)
 postsurvey$interview <- 1:nrow(postsurvey)
 
+# Cast as numeric
+presurvey <- sapply(presurvey, as.numeric)
+postsurvey <- sapply(postsurvey, as.numeric)
+
 # Bind together data sets
 dialg.sys.data <- merge(candidate, transcript.set, by = "interview")
 dialg.sys.data <- merge(dialg.sys.data, presurvey, by = "interview")
 dialg.sys.data <- merge(dialg.sys.data, postsurvey, by = "interview")
 
+# Get survey diffs
+dialg.sys.data$interest.level <- dialg.sys.data$post.interest.level - dialg.sys.data$pre.interest.level
+dialg.sys.data$satisfaction <- dialg.sys.data$post.satisfaction - dialg.sys.data$pre.satisfaction
+dialg.sys.data$asr.confidence <- dialg.sys.data$post.asr.confidence - dialg.sys.data$pre.asr.confidence
+dialg.sys.data$ease.of.use <- dialg.sys.data$post.ease.of.use - dialg.sys.data$pre.ease.of.use
+dialg.sys.data$previous.experience <- dialg.sys.data$post.previous.experience - dialg.sys.data$pre.previous.experience
+
 # Write data table for sharing purposes
 write.csv(dialg.sys.data, file = "dialg.sys.data.csv", row.names = FALSE)
 
-# Find best predictor of user satisfaction
+# Insufficient data for reasonable cross validation
+
+## Find best predictor of user satisfaction
+
+# Apply Stepwise Regression
+fit.stepwise <- lm(satisfaction ~ avg.system.utterance.len + 
+                     avg.user.utterance.len +
+                     avg.system.word.len +
+                     avg.user.word.len +
+                     interest.level + 
+                     asr.confidence + 
+                     ease.of.use + 
+                     previous.experience , data = dialg.sys.data)
+step <- stepAIC(fit.stepwise, directions = "both")
+step
+
+# Apply all-subsets regression
+fit.leaps <- regsubsets(satisfaction ~ avg.system.utterance.len + 
+                            avg.user.utterance.len +
+                            avg.system.word.len +
+                            avg.user.word.len +
+                            interest.level + 
+                            asr.confidence + 
+                            ease.of.use + 
+                            previous.experience , data = dialg.sys.data, nbest = 3)
+#summary(fit.leaps)
+plot(fit.leaps, scale = "r2")
