@@ -5,6 +5,7 @@ library(RJSONIO)
 library(RCurl)
 library(MASS)
 library(leaps)
+library(ggplot2)
 
 # Import data from json files
 for(file in c('candidate.json', 'transcript.json', 'presurvey.json', 'postsurvey.json')) {
@@ -88,7 +89,9 @@ transcript.set <- data.frame(interview = numeric(0),
                              avg.system.utterance.len = numeric(0),
                              avg.user.utterance.len = numeric(0),
                              avg.system.word.len = numeric(0),
-                             avg.user.word.len = numeric(0))
+                             avg.user.word.len = numeric(0),
+                             quite.count = numeric(0),
+                             back.count = numeric(0))
 interview.number <- 1
 
 for(interview in unique(transcript$interview)) {
@@ -118,6 +121,12 @@ for(interview in unique(transcript$interview)) {
   
   # Average user word length
   feature.set <- c(feature.set, mean(unlist(lapply(strsplit(paste(subset[which(subset$speaker == "C"), "line_contents"], collapse = " "), split = " ")[[1]], nchar))))
+  
+  # Quite count
+  feature.set <- c(feature.set, sum(unlist(lapply(subset[which(subset$speaker == "C"), "line_contents"], FUN = function(x) grepl("quite", x)))))
+  
+  # Back count
+  feature.set <- c(feature.set, sum(unlist(lapply(subset[which(subset$speaker == "C"), "line_contents"], FUN = function(x) grepl("back", x)))))
   
   # Append feature set to transcript.set row
   transcript.set[interview.number,] <- feature.set
@@ -162,7 +171,7 @@ fit.stepwise <- lm(satisfaction ~ avg.system.utterance.len +
                      interest.level + 
                      asr.confidence + 
                      ease.of.use + 
-                     previous.experience , data = dialg.sys.data)
+                     previous.experience, data = dialg.sys.data)
 step <- stepAIC(fit.stepwise, directions = "both")
 step
 
@@ -174,6 +183,102 @@ fit.leaps <- regsubsets(satisfaction ~ avg.system.utterance.len +
                             interest.level + 
                             asr.confidence + 
                             ease.of.use + 
-                            previous.experience , data = dialg.sys.data, nbest = 3)
+                            previous.experience, data = dialg.sys.data, nbest = 3, nvmax = 4)
 #summary(fit.leaps)
-plot(fit.leaps, scale = "r2")
+
+# Modify plot.regsubsets function
+plot.regsubsets<-function(x,labels=obj$xnames,main=NULL,
+                          scale=c("bic","Cp","adjr2","r2"),
+                          col=gray(seq(0,0.9,length=10)),mar = c(7,5,6,3)+0.1, ...){
+  obj<-x
+  lsum<-summary(obj)
+  par(mar=mar)
+  nmodels<-length(lsum$rsq)
+  np<-obj$np
+  propscale<-FALSE
+  sscale<-pmatch(scale[1],c("bic","Cp","adjr2","r2"),nomatch=0)
+  if (sscale==0)
+    stop(paste("Unrecognised scale=",scale))
+  if (propscale)
+    stop(paste("Proportional scaling only for probabilities"))
+  
+  yscale<-switch(sscale,lsum$bic,lsum$cp,lsum$adjr2,lsum$rsq)
+  up<-switch(sscale,-1,-1,1,1)
+  
+  index<-order(yscale*up)
+  
+  colorscale<- switch(sscale,
+                      yscale,yscale,
+                      -log(pmax(yscale,0.0001)),-log(pmax(yscale,0.0001)))
+  
+  image(z=t(ifelse(lsum$which[index,],
+                   colorscale[index],NA+max(colorscale)*1.5)),
+        xaxt="n",yaxt="n",x=(1:np),y=1:nmodels,xlab="",ylab=scale[1],col=col)
+  
+  laspar<-par("las")
+  on.exit(par(las=laspar))
+  par(las=2)
+  axis(1,at=1:np,labels=labels)
+  axis(2,at=1:nmodels,labels=signif(yscale[index],2))
+  
+  if (!is.null(main))
+    title(main=main)
+  box()
+  invisible(NULL)
+}
+
+plot(fit.leaps, scale = "r2", mar = c(15,4.1,4.1,2.1), main = "Regression Model Selection (for Satisfaction)", labels = c("Intercept", "Average System Utterance Length",
+                                                                              "Average User Utterance Length",
+                                                                              "Averge System Word Length",
+                                                                              "Average User Word Length",
+                                                                              "Interest Level",
+                                                                              "ASR Confidence",
+                                                                              "Ease of Use",
+                                                                              "Previous Experience"))
+
+library(car)
+
+## Adjusted R2
+## Plot some distributions
+
+# Density plots for average utterance length
+dist.data <- data.frame(source = "system", avg.utterance.len =  dialg.sys.data$avg.system.utterance.len)
+dist.data <- rbind(dist.data, data.frame(source = "user", avg.utterance.len =  dialg.sys.data$avg.user.utterance.len))
+ggplot(dist.data, aes(x = avg.utterance.len, fill = source)) + geom_density(alpha=.3)  +
+  xlab("Average Utterance Length (words)") +
+  ylab("Density") +
+  ggtitle("Density Plot of Average Utterance Length")  + theme(legend.text=element_text(size=12))
+
+
+# Density plot for total words spoken
+dist.data <- data.frame(source = "system", avg.word.len =  dialg.sys.data$avg.system.word.len)
+dist.data <- rbind(dist.data, data.frame(source = "user", avg.word.len =  dialg.sys.data$avg.user.word.len))
+ggplot(dist.data, aes(x = avg.word.len, fill = source)) + geom_density(alpha=.3)  +
+  xlab("Average Word Length (characters)") +
+  ylab("Density") +
+  ggtitle("Density Plot of Average Word Length")  + theme(legend.text=element_text(size=12))
+
+
+# Density plots of survey outcomes
+survey.data <- data.frame(metric = "satisfaction", likert.value.change = dialg.sys.data$post.satisfaction)
+survey.data <- rbind(survey.data, data.frame(metric = "interest level", likert.value.change = dialg.sys.data$post.interest.level))
+survey.data <- rbind(survey.data, data.frame(metric = "asr confidence", likert.value.change = dialg.sys.data$post.asr.confidence))
+survey.data <- rbind(survey.data, data.frame(metric = "ease of use", likert.value.change = dialg.sys.data$post.ease.of.use))
+survey.data <- rbind(survey.data, data.frame(metric = "previous experience", likert.value.change = dialg.sys.data$post.previous.experience))
+ggplot(survey.data, aes(x = likert.value.change, fill = metric)) + geom_density(alpha=.3) + 
+  xlab("Likert Scale Value") +
+  ylab("Density") +
+  ggtitle("Density Plot of Post-Use Survey")  + theme(legend.text=element_text(size=12))
+
+
+# Density plots of survey outcome shift
+survey.data <- data.frame(metric = "satisfaction", likert.value.change = dialg.sys.data$satisfaction)
+survey.data <- rbind(survey.data, data.frame(metric = "interest level", likert.value.change = dialg.sys.data$interest.level))
+survey.data <- rbind(survey.data, data.frame(metric = "asr confidence", likert.value.change = dialg.sys.data$asr.confidence))
+survey.data <- rbind(survey.data, data.frame(metric = "ease of use", likert.value.change = dialg.sys.data$ease.of.use))
+survey.data <- rbind(survey.data, data.frame(metric = "previous experience", likert.value.change = dialg.sys.data$previous.experience))
+ggplot(survey.data, aes(x = likert.value.change, fill = metric)) + geom_density(alpha=.3) +
+  xlab("Likert Scale Value Change (Post - Pre)") +
+  ylab("Density") +
+  ggtitle("Density Plot of Pre-/Post-Survey Differences") + theme(legend.text=element_text(size=12))
+
