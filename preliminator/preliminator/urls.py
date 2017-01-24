@@ -24,5 +24,6 @@ from django.utils import simplejson """
 urlpatterns = [
 	url(r'^demo/', include('demo.urls')),
     url(r'^admin/', admin.site.urls),
-    url(r'', include('demo.urls')),
+    url(r'^dialg/', include('dialg.urls')),
+    url(r'^', include('demo.urls')),
 ]

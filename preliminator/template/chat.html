@@ -1,0 +1,245 @@
+<html>
+<head>
+
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+
+   <title>Compling Chatbot</title>
+
+   <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
+
+   <!-- Latest compiled and minified Bootstrap CSS -->
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+   <!-- CUSTOM STYLE CSS
+   <link href="../static/css/style.css" rel="stylesheet" /> -->
+   <link href="https://fonts.googleapis.com/css?family=Shrikhand" rel="stylesheet">
+</head>
+
+
+
+<body>
+
+   <!-- Static navbar -->
+   <nav class="navbar navbar-default new-font">
+      <div class="container-fluid">
+         <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+               <span class="sr-only">Toggle navigation</span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+               <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Compling Chatbot</a>
+         </div>
+
+         <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+               <li class="active" color =><a href="/index.html">Home</a></li>
+               <li><a href="#">Sign In</a></li>
+               <li><a href="/candidate_form.html">Demo</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+               <li><a href="#">Configuration<span class="sr-only">(current)</span></a></li>
+               <li><a href="/about_team.html">About the Team</a></li>
+               <li><a href="#">About the Preliminator</a></li>
+            </ul>
+         </div><!--/.nav-collapse -->
+      </div><!--/.container-fluid -->
+   </nav>
+
+   <style>
+   @import url('https://fonts.googleapis.com/css?family=Josefin+Sans:100,300,400,600,700|Titillium+Web:200,300,400,600,700');
+   .btn {
+    background-color: #661aff;
+   }
+
+   .chat-box-head {
+      font-family: "Titillium Web";
+      font-size: 32pt;
+      font-weight: 200;
+      padding: 10px 15px;
+      border-top-right-radius: 5px;
+      border-top-left-radius: 5px;
+      background-color: #661aff;
+      color: black;
+      text-align: center;
+
+   }
+   .chat-box-main {
+      height:80%;
+      overflow:auto;
+      background-color: #ccccff;
+   }
+   .chat-box-div {
+      border-radius: 5px;
+   }
+   .chat-bubble {
+      min-height: 90px;
+      width: 100%;
+      height: auto;
+      padding: 10px;
+      -webkit-border-radius: 5px;
+      -moz-border-radius: 5px;
+      border-radius: 5px;
+      position: relative;
+      border: 1px solid #C5C5C5;
+      font-size:14px;
+   }
+   .user-pic-n-name{
+      position:absolute;;
+      left: 0;
+      text-align: center;
+   }
+   .img-rounded-sq {
+      border-radius: 15px;
+      width: 65px;
+      height: 65px;
+   }
+   .interviewer-pic{
+      text-align: right;
+      border: 2px solid #049E64;
+   }
+   .interviewee-pic{
+      text-align: left;
+      border: 2px solid #354EA0;
+   }
+   .hr-class-low {
+      width: 80%;
+      border-top: 1px solid #C5C5C5;
+   }
+
+   .mic_icon{
+      position:absolute;
+      z-index: 10;
+      right: 65px;
+      top:2px;
+      width: 30px;
+      height: 30px;
+   }
+
+   .navbar{
+    background: #bb99ff;
+   }
+
+   .active{
+      background-color: #661aff;
+   }
+   .rounded{
+      border-radius: 10px;
+   }
+
+   .specific-rounded{
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
+   }
+
+   .new-font{
+        font-family: "Titillium Web";
+   }
+
+   .sidebar-heading{
+        font-size: 27px;
+   }
+
+   .clickable{
+      cursor:pointer;
+   }
+   #toggle_synth:hover{
+
+   }
+   </style>
+
+
+   <div class="col-sm-8 col-sm-offset-1 container rounded new-font">
+      <div class="row pad-top pad-bottom rounded">
+            <div class="chat-box-div">
+               <div class="chat-box-head new-font">
+                  Compling Chatbot
+                  <div class="btn-group pull-right">
+
+                     <span class="clickable glyphicon glyphicon-volume-up" id="toggle_synth" title="Click to toggle speech synthesis"></span>
+
+                     <!-- <button type="button" class="btn btn-info spe" data-toggle="dropdown" aria-expanded="false">
+                        <span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span>
+                        <span>Options</span>
+                     </button>
+                     <ul class="dropdown-menu" role="menu">
+                        <li id="toggle_sound">
+                           <a href="#">
+                              <h5>
+                                 <span class="glyphicon glyphicon-check" id="toggle_sound_glyphicon"></span>
+                                 &nbsp;Speech Synthesis&nbsp;
+                                 <span class="glyphicon glyphicon-volume-up" id="audio_glyph"></span>
+                              </h5>
+                           </a>
+                        </li>
+                     </ul> -->
+
+                  </div>
+               </div>
+
+
+               <div class="panel-body chat-box-main" id = "add-messages">
+
+               </div>
+
+               <div class="chat-box-footer">
+                  <div class="input-group">
+                     <input type="text" id="user_input_box" class="form-control" placeholder="Type your response or speak into the microphone.">
+                     <span class="input-group-btn">
+                        <button class="btn btn-info" id="submit_btn" type="button" >Enter</button>
+                     </span>
+                  </div>
+               </div>
+
+            </div>
+         </div>
+      </div>
+      <div class="col-sm-2 container" style = "margin-left: 30px">
+        <div class="row pad-top pad-bottom rounded">
+              <div class="chat-box-div">
+                 <div class="chat-box-head new-font sidebar-heading">
+                   Instructions
+                 </div>
+               </div>
+
+                   <div class="panel-body chat-box-main" id = "add-messages">
+                         <div class="col-xs-offset-1">
+                           	<h5> <b>Starting Compling Chatbot</b> </h5>
+                            <ul>
+                            <li>Press <b>enter</b> to start the demo or by speaking into the microphone.</li>
+                            </ul>
+                            <h5> <b>Using the Chatbot</b> </h5>
+                            <ul>
+                            <li>You may interact with the system by typing your response or speaking directly into the mic.</li>
+                            <li>You can toggle speech synthesis on or off by clicking on the microphone button at the top of the page.</li>
+                            <li>Speak or type, <b>"back"</b>, at any time to go back to the previous utterance.</li>
+                            </ul>
+                            <h5> <b>Ending the Chatbot</b> </h5>
+                            <ul>
+                            <li>To end your session, please speak or enter <b>"quit"</b>, and click on the provided link.</li>
+                            </ul>
+                            <hr/>
+
+                      </div>
+                   </div>
+      </div>
+   </div>
+
+
+
+   <!-- Speech recognition wrapper API -->
+   <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.0/annyang.min.js"></script>
+   <!-- Page interactivity JS -->
+   <script type="text/javascript" src="../static/js/interview_page.js"></script>
+
+   <!-- USING SCRIPTS BELOW TO REDUCE THE LOAD TIME -->
+   <!-- CORE JQUERY SCRIPTS FILE -->
+   <script src="../static/js/jquery-1.11.1.js"></script>
+
+   <!-- Latest compiled and minified Bootstrap JavaScript -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</body>
+</html>
