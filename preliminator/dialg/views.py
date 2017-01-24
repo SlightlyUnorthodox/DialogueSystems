@@ -6,6 +6,8 @@ from django.views.decorators.csrf import *
 from nltk.chat.util import Chat, reflections
 from nltk.chat.rude import pairs
 
+import time
+
 test_chatbot = Chat(pairs, reflections)
 
 def index(request):
@@ -38,4 +40,4 @@ def process_ajax(request):
 
 
 	# Render utterance to screen
-	return HttpResponse(test_chatbot(str(user_utterance)))
+	return HttpResponse(test_chatbot.respond(str(user_utterance).lower()))
